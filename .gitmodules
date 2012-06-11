@@ -1,0 +1,12 @@
+[submodule "html5-boilerplate"]
+	path = lib/html5-boilerplate
+	url = http://github.com/h5bp/html5-boilerplate
+[submodule "lib/mongrel2-cpp"]
+	path = lib/mongrel2-cpp
+	url = https://github.com/akrennmair/mongrel2-cpp.git
+[submodule "lib/cjango"]
+	path = lib/cjango
+	url = https://github.com/fawek/cjango.git
+[submodule "lib/httplib"]
+	path = lib/httplib
+	url = https://github.com/jlsandell/httplib.git

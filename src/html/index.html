@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block contents %}
+My first name is {{ first_name }}. My last name is {{ last_name }}.
+
+<form action="/login" method="post">
+    First name: <input type="text" name="firstname" /><br />
+    Last name: <input type="text" name="lastname" /><br />
+    Password: <input type="password" name="pwd" /><br />
+    <input type="submit" value="Submit" />
+</form>
+{% endblock %}
