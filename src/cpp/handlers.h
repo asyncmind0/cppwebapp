@@ -13,6 +13,9 @@
 #include "MPFDParser-0.1.1/Exception.h"
 #include "MPFDParser-0.1.1/Field.h"
 #include <curl/curl.h>
+#include <log4cxx/logger.h>
+
+static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("handlers:"));
 
 static std::vector<m2pp::header> default_headers = {{"Content-Type","text/html"},};
 
@@ -25,32 +28,32 @@ void base_context(cjango::Context& context){
 template <typename OutIt>
 OutIt split(const std::string &text, char sep, OutIt out)
 {
-    size_t start = 0, end=0;
-    while((end = text.find(sep, start)) != std::string::npos)
+  size_t start = 0, end=0;
+  while((end = text.find(sep, start)) != std::string::npos)
     {
-        *out++ = text.substr(start, end - start);
-        start = end + 1;
+      *out++ = text.substr(start, end - start);
+      start = end + 1;
     }
-    *out++ = text.substr(start);
-    return out;
+  *out++ = text.substr(start);
+  return out;
 }
 std::unordered_map<std::string, std::string> getFormFields(std::string& form_data){
-    CURL *curl = curl_easy_init( );
-    std::unordered_map<std::string, std::string> form_fields;
-    std::vector<std::string> pairs;
-    split(form_data, '&', std::back_inserter(pairs));
-    for(auto a:pairs){
-        std::vector<std::string> vals;
-        split(a, '=', std::back_inserter(vals));
-        if(vals.size() == 2){
-            char *unencoded_value =  curl_easy_unescape(curl , vals[1].c_str() , 0 , nullptr); 
-            char *unencoded_key =  curl_easy_unescape(curl , vals[0].c_str() , 0 , nullptr); 
-            form_fields[unencoded_key] = std::string(unencoded_value);
-            curl_free(unencoded_key);
-            curl_free(unencoded_value);
-        }
+  CURL *curl = curl_easy_init( );
+  std::unordered_map<std::string, std::string> form_fields;
+  std::vector<std::string> pairs;
+  split(form_data, '&', std::back_inserter(pairs));
+  for(auto a:pairs){
+    std::vector<std::string> vals;
+    split(a, '=', std::back_inserter(vals));
+    if(vals.size() == 2){
+      char *unencoded_value =  curl_easy_unescape(curl , vals[1].c_str() , 0 , nullptr); 
+      char *unencoded_key =  curl_easy_unescape(curl , vals[0].c_str() , 0 , nullptr); 
+      form_fields[unencoded_key] = std::string(unencoded_value);
+      curl_free(unencoded_key);
+      curl_free(unencoded_value);
     }
-    return form_fields;
+  }
+  return form_fields;
 }
 std::map<std::string,MPFD::Field *> getFormFields(const char* form_data, const std::string content_type){
   try {
@@ -77,6 +80,7 @@ std::map<std::string,MPFD::Field *> getFormFields(const char* form_data, const s
 }
   
 void index_handler(m2pp::request& req, m2pp::connection& conn ){
+  LOG4CXX_DEBUG(logger, "entering handler:" << __func__);
   std::fstream inputStream((templatepath+"/index.html").c_str(), std::fstream::in);
   cjango::Parser parser(&inputStream);
   cjango::TemplateNode* root = parser.parse();
@@ -92,15 +96,14 @@ void index_handler(m2pp::request& req, m2pp::connection& conn ){
 }
 
 void login_handler(m2pp::request& req, m2pp::connection& conn ){
-    for(auto fields:getFormFields(req.body)){
-            std::cout << fields.first << " = " << fields.second << std::endl;
-    }
-        
-    conn.reply_http(req, "loggin done");
+  for(auto fields:getFormFields(req.body)){
+    std::cout << fields.first << " = " << fields.second << std::endl;
+  }
+  conn.reply_http(req, "loggin done");
 }
 
 void dbtest_handler(m2pp::request& req, m2pp::connection& conn ){
-    //test_connection();
+  //test_connection();
   time_t now = time(NULL);
   Post p("my c++ blog","I must be mental to write webapplications in c++, a genuine sociopath I am.","23232312sadad",now);
   createPost(p);

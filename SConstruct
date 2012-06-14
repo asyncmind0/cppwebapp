@@ -22,7 +22,7 @@ env.Program('build/main',
             LIBS=['cjango','m2pp','zmq','json',
                   'pthread','m','rt','pq',
                   'httplib','boost_system', 'boost_regex',
-                  'MPFDParser', 'curl'],
+                  'MPFDParser', 'curl', 'log4cxx'],
             LIBPATH=['.'])
 
 Repository(['build/lib/',
