@@ -1,198 +1,107 @@
 #include <libpq-fe.h>
 #include <iostream>
 #include <time.h>
+#include <pantheios/pantheios.hpp>
+#include <soci/soci.h>
+#include <soci/type-conversion.h>
+#include <soci/postgresql/soci-postgresql.h>
+#include <exception>
 
 class Post {
+public:
     std::string title;
     std::string body;
     std::string uuid;
-    time_t created_datetime;
+    std::tm created_datetime;
 
-public:
 
-    Post(std::string title, std::string body, std::string uuid,time_t created_datetime = time(NULL))
+Post(std::string title, std::string body, std::string uuid,std::tm created_datetime)
     :title(title), body(body), uuid(uuid), created_datetime(created_datetime)
     {
     }
     ~Post(){
     }
-    std::string getInsertSql(){
-        char buff[20];
-        strftime(buff, 20, "%Y-%m-%d %H:%M:%S", localtime(&created_datetime));
-        std::ostringstream stringStream;
-        stringStream << "INSERT INTO blog_posts VALUES ('" << title << "', '" << body << "','" << uuid << "','"<< buff << "');";
-        return stringStream.str();
-    }
 };
+const size_t poolSize = 10;
+static soci::connection_pool pool(poolSize);
+static bool soci_pool_initialized = 0;
 
-static void exit_nicely(PGconn *conn)
+namespace soci
 {
-  PQfinish(conn);
+    template<> struct type_conversion<Post>
+    {
+        typedef values base_type;
+        static void from_base(values const & v, indicator /* ind */, Post & p)
+        {
+            p.title = v.get<std::string>("title");
+            p.uuid = v.get<std::string>("uuid");
+            p.body = v.get<std::string>("body");
+            p.created_datetime = v.get<std::tm>("createdtime");
+
+            // p.gender will be set to the default value "unknown"
+            // when the column is null:
+            //p.created_datetime = v.get<std::tm>("createdtime", "unknown");
+
+            // alternatively, the indicator can be tested directly:
+            // if (v.indicator("GENDER") == i_null)
+            // {
+            //     p.gender = "unknown";
+            // }
+            // else
+            // {
+            //     p.gender = v.get<std::string>("GENDER");
+            // }
+        }
+        
+        static void to_base(const Post & p, values & v, indicator & ind)
+        {
+            v.set("uuid", p.uuid);
+            v.set("title", p.title);
+            v.set("body", p.body);
+            v.set("createdtime", p.created_datetime); //, p.created_datetime == std::nullptr ? i_null : i_ok);
+            ind = i_ok;
+        }
+    };
 }
 
-bool PQexecStatusCheck(PGconn *conn, const char* cmd, const char* message){
-  PGresult   *res;
-  res = PQexec(conn, cmd);
-  if (PQresultStatus(res) != PGRES_COMMAND_OK)
+int init_soci(){
+    if(soci_pool_initialized==1)return 0 ;
+    for (size_t i = 0; i != poolSize; ++i)
     {
-        fprintf(stderr, "%s %s",message, PQerrorMessage(conn));
-        PQclear(res);
-        PQfinish(conn);
-        return 0;
+        soci::session & sql = pool.at(i);
+        sql.open("postgresql://dbname=cppblog");
     }
-  PQclear(res);
-  return 1;
+    soci_pool_initialized=1;
+    return 1;
+}
+
+int getPosts(){
+    try{
+        soci::session sql(pool);
+        int count;
+        sql << "select count(*) from blog_posts", soci::into(count);
+        std::cout << "We have " << count << " entries in the blog.\n";
+    }catch (std::exception const &e){
+        std::cerr << "Error: " << e.what() << '\n';
+    }catch(...){
+        pantheios::log_ERROR("db error");
+    }
+    return 0;
 }
 
 int createPost(Post& p){
-  const char *conninfo = "dbname = cppblog";
-  PGconn     *conn;
-  PGresult   *res;
-  conn = PQconnectdb(conninfo);
-  if (PQstatus(conn) != CONNECTION_OK)
-    {
-      fprintf(stderr, "Connection to database failed: %s",
-              PQerrorMessage(conn));
-      exit_nicely(conn);
+    try{
+        soci::session sql(pool);
+        int count;
+        sql << "insert into blog_posts(uuid, title, body, createdtime) values(:uuid, :title, :body, :createdtime)", soci::use(p);
+        std::cout << "We have inserted post" << std::endl;
+    }catch (std::exception const &e){
+        std::cerr << "Error: " << e.what() << '\n';
+    }catch(...){
+        pantheios::log_ERROR("db error");
     }
-  if(PQexecStatusCheck(conn, "BEGIN","Begin failed")){
-      if(PQexecStatusCheck(conn, p.getInsertSql().c_str(),"insert failed")){
-          PQexecStatusCheck(conn,"END","error finishingup");
-      }
-  }
-  PQfinish(conn);
+    return 0;
+    return 0;
 }
 
 
-int test_connection()
-{
-  std::cout << "test db1" <<std::endl;
-  const char *conninfo = "dbname = cppblog";
-  PGconn     *conn;
-  PGresult   *res;
-  int                     nFields;
-  int                     i,
-    j;
-  /* Make a connection to the database */
-  conn = PQconnectdb(conninfo);
-
-  std::cout << "test db2" <<std::endl;
-  /* Check to see that the backend connection was successfully made */
-  if (PQstatus(conn) != CONNECTION_OK)
-    {
-      fprintf(stderr, "Connection to database failed: %s",
-              PQerrorMessage(conn));
-      exit_nicely(conn);
-    }
-
-  /*
-   * Our test case here involves using a cursor, for which we must be
-   * inside a transaction block.  We could do the whole thing with a
-   * single PQexec() of "select * from pg_database", but that's too
-   * trivial to make a good example.
-   */
-
-  /* Start a transaction block */
-  std::cout << "test db3" <<std::endl;
-  res = PQexec(conn, "BEGIN");
-  if (PQresultStatus(res) != PGRES_COMMAND_OK)
-    {
-      fprintf(stderr, "BEGIN command failed: %s", PQerrorMessage(conn));
-      PQclear(res);
-      exit_nicely(conn);
-    }
-
-  /*
-   * Should PQclear PGresult whenever it is no longer needed to avoid
-   * memory leaks
-   */
-  PQclear(res);
-
-  /*
-   * Fetch rows from pg_database, the system catalog of databases
-   */
-  std::cout << "test db4" <<std::endl;
-  res = PQexec(conn, "DECLARE myportal CURSOR FOR select * from pg_database");
-  if (PQresultStatus(res) != PGRES_COMMAND_OK)
-    {
-      fprintf(stderr, "DECLARE CURSOR failed: %s", PQerrorMessage(conn));
-      PQclear(res);
-      exit_nicely(conn);
-    }
-  PQclear(res);/* Make a connection to the database */
-  conn = PQconnectdb(conninfo);
-
-  /* Check to see that the backend connection was successfully made */
-  if (PQstatus(conn) != CONNECTION_OK)
-    {
-      fprintf(stderr, "Connection to database failed: %s",
-              PQerrorMessage(conn));
-      exit_nicely(conn);
-    }
-
-  /*
-   * Our test case here involves using a cursor, for which we must be
-   * inside a transaction block.  We could do the whole thing with a
-   * single PQexec() of "select * from pg_database", but that's too
-   * trivial to make a good example.
-   */
-
-  /* Start a transaction block */
-  res = PQexec(conn, "BEGIN");
-  if (PQresultStatus(res) != PGRES_COMMAND_OK)
-    {
-      fprintf(stderr, "BEGIN command failed: %s", PQerrorMessage(conn));
-      PQclear(res);
-      exit_nicely(conn);
-    }
-
-  /*
-   * Should PQclear PGresult whenever it is no longer needed to avoid
-   * memory leaks
-   */
-  PQclear(res);
-
-  /*
-   * Fetch rows from pg_database, the system catalog of databases
-   */
-  res = PQexec(conn, "DECLARE myportal CURSOR FOR select * from pg_database");
-  if (PQresultStatus(res) != PGRES_COMMAND_OK)
-    {
-      fprintf(stderr, "DECLARE CURSOR failed: %s", PQerrorMessage(conn));
-      PQclear(res);
-      exit_nicely(conn);
-    }
-  res = PQexec(conn, "FETCH ALL in myportal");
-  if (PQresultStatus(res) != PGRES_TUPLES_OK)
-    {
-      fprintf(stderr, "FETCH ALL failed: %s", PQerrorMessage(conn));
-      PQclear(res);
-      exit_nicely(conn);
-    }
-
-  /* first, print out the attribute names */
-  nFields = PQnfields(res);
-  for (i = 0; i < nFields; i++)
-    printf("%-15s", PQfname(res, i));
-  printf("\n\n");
-
-  /* next, print out the rows */
-  for (i = 0; i < PQntuples(res); i++)
-    {
-      for (j = 0; j < nFields; j++)
-        printf("%-15s", PQgetvalue(res, i, j));
-      printf("\n");
-    }
-
-  PQclear(res);
-
-  /* close the portal ... we don't bother to check for errors ... */
-  res = PQexec(conn, "CLOSE myportal");
-  PQclear(res);
-
-  /* end the transaction */
-  res = PQexec(conn, "END");
-  PQclear(res);
-  /* close the connection to the database and cleanup */
-  PQfinish(conn);
-}

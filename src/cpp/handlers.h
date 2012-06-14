@@ -13,9 +13,7 @@
 #include "MPFDParser-0.1.1/Exception.h"
 #include "MPFDParser-0.1.1/Field.h"
 #include <curl/curl.h>
-#include <log4cxx/logger.h>
 
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("handlers:"));
 
 static std::vector<m2pp::header> default_headers = {{"Content-Type","text/html"},};
 
@@ -80,7 +78,6 @@ std::map<std::string,MPFD::Field *> getFormFields(const char* form_data, const s
 }
   
 void index_handler(m2pp::request& req, m2pp::connection& conn ){
-  LOG4CXX_DEBUG(logger, "entering handler:" << __func__);
   std::fstream inputStream((templatepath+"/index.html").c_str(), std::fstream::in);
   cjango::Parser parser(&inputStream);
   cjango::TemplateNode* root = parser.parse();
@@ -105,8 +102,10 @@ void login_handler(m2pp::request& req, m2pp::connection& conn ){
 void dbtest_handler(m2pp::request& req, m2pp::connection& conn ){
   //test_connection();
   time_t now = time(NULL);
-  Post p("my c++ blog","I must be mental to write webapplications in c++, a genuine sociopath I am.","23232312sadad",now);
+  std::tm *timeinfo = localtime(&now);
+  Post p("my c++ blog","I must be mental to write webapplications in c++, a genuine sociopath I am.","23232312sadad",*timeinfo);
   createPost(p);
+  getPosts();
   conn.reply_http(req, "Dbtest done");
 }
 
