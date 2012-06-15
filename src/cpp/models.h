@@ -6,20 +6,30 @@
 #include <soci/type-conversion.h>
 #include <soci/postgresql/soci-postgresql.h>
 #include <exception>
+#include <list>
+#include "cjango/Variant.h"
 
-class Post {
+class Post : public cjango::Variant
+{
 public:
     std::string title;
     std::string body;
     std::string uuid;
     std::tm created_datetime;
 
-
+    Post(){
+    }
 Post(std::string title, std::string body, std::string uuid,std::tm created_datetime)
     :title(title), body(body), uuid(uuid), created_datetime(created_datetime)
     {
     }
     ~Post(){
+    }
+    friend std::ostream& operator<<(std::ostream& ostr, const Post& post){
+      ostr << "uuid:" << post.uuid << std::endl;
+      ostr << "title:" << post.title << std::endl;
+      ostr << "body:" << post.body << std::endl;
+      ostr << "created_datetime:" << asctime(&post.created_datetime) << std::endl;
     }
 };
 const size_t poolSize = 10;
@@ -75,16 +85,34 @@ int init_soci(){
     return 1;
 }
 
-int getPosts(){
+int create_tables(){
     try{
-        soci::session sql(pool);
+      soci::session sql(pool);
+      sql << "create table blog_posts (title varchar(200), body varchar(500), uuid varchar(100), createdtime timestamp);";
+    }catch (std::exception const &e){
+        pantheios::log_ERROR("db error:", e);
+    }catch(...){
+        pantheios::log_ERROR("unknown db error");
+    }
+    return 1;
+}
+
+int getPosts(std::list<Post> &posts){
+    try{
         int count;
+        soci::session sql(pool);
         sql << "select count(*) from blog_posts", soci::into(count);
         std::cout << "We have " << count << " entries in the blog.\n";
+        soci::rowset<Post> rs = (sql.prepare << "select * from blog_posts");
+        for(auto it:rs)
+          {
+            std::cout << it << std::endl;
+            posts.push_back(it);
+          }
     }catch (std::exception const &e){
-        std::cerr << "Error: " << e.what() << '\n';
+        pantheios::log_ERROR("db error:", e);
     }catch(...){
-        pantheios::log_ERROR("db error");
+        pantheios::log_ERROR("unknown db error");
     }
     return 0;
 }

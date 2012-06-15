@@ -5,7 +5,7 @@
 #include <sstream>
 #include <fstream>
 #include <unordered_map>
-#include "m2pp.hpp"
+#include <m2pp.hpp>
 #include <regex>
 #include <future>
 #include <curl/curl.h>
@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
             std::cout << "== starting db connection pool failed ==" << std::endl;
             return 1;
         }
+        create_tables();
         std::cout << "== starting server ==" << std::endl;
         int handled = 0;
         while (1) {

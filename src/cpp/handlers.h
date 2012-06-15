@@ -8,6 +8,7 @@
 #include "cjango/Parser.h"
 #include "cjango/TemplateNode.h"
 #include "cjango/Context.h"
+#include "cjango/Variant.h"
 #include "cjango/VariantUtils.h"
 #include "MPFDParser-0.1.1/Parser.h"
 #include "MPFDParser-0.1.1/Exception.h"
@@ -83,8 +84,11 @@ void index_handler(m2pp::request& req, m2pp::connection& conn ){
   cjango::TemplateNode* root = parser.parse();
   cjango::Context context;
   base_context(context);
+  std::list<Post> posts;
+  getPosts(posts);
   context.set("first_name", std::string("Steven"));
   context.set("last_name", std::string("Joseph"));
+  context.set("posts", cjango::Variant(posts.front()));
   std::ostringstream outputStream;
   root->render(&context, &outputStream);
   //std::cout << outputStream.str() <<std::endl;
@@ -105,7 +109,8 @@ void dbtest_handler(m2pp::request& req, m2pp::connection& conn ){
   std::tm *timeinfo = localtime(&now);
   Post p("my c++ blog","I must be mental to write webapplications in c++, a genuine sociopath I am.","23232312sadad",*timeinfo);
   createPost(p);
-  getPosts();
+  std::list<Post> posts;
+  getPosts(posts);
   conn.reply_http(req, "Dbtest done");
 }
 
