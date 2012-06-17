@@ -34,8 +34,18 @@
     <!--[if lt IE 7]><p class="chromeframe">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
 
     <!-- Add your site or application content here -->
-    {{>CONTENT}}
-
+    <section class="wrapper">
+      <header>
+      </header>
+      <section class="content">
+        {{>CONTENT}}
+      </section>
+      <aside class="sidebar">
+      </aside>
+      </footer>
+      {{FOOTER}}
+      </footer>
+    </section>
     <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -55,6 +65,5 @@
         g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
         s.parentNode.insertBefore(g,s)}(document,'script'));
     </script>-->
-    {{FOOTER}}
 </body>
 </html>

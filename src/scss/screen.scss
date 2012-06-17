@@ -1,0 +1,16 @@
+@import "compass/reset";
+@import "960/grid";
+// The following generates the default grids provided by the css version of 960.g
+.container_12 {
+    @include grid-system(12); }
+$ninesixty-columns: 24;
+.wrapper {
+    @include grid-container;
+    header.main, footer.main {
+        @include grid(24); }
+    #sidebar {
+        @include grid(4); }
+    .content {
+        @include grid(20); } }
+
+   
