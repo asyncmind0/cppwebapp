@@ -17,8 +17,10 @@
 static const std::string templatepath = "src/html/";
 typedef void (*request_handler)(m2pp::request& req, m2pp::connection& conn);
 
-#include "models.h"
+#include "models/post.h"
+#include "models/user.h"
 #include "handlers.h"
+#include "cache.h"
 
 //Specify process identity
 const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "cppwebapp";
@@ -38,15 +40,13 @@ int main(int argc, char *argv[])
         pantheios::log_ALERT("alert");
         pantheios::log_EMERGENCY("emergency");
 
-        if(curl_global_init(CURL_GLOBAL_ALL)!=0){
-            std::cerr << "Curl init failed" << std::endl;
-        }
 
         std::string sender_id = "82209006-86FF-4982-B5EA-D1E29E55D481";
         std::unordered_map<std::string, request_handler> request_handlers;
         request_handlers["/"] = &index_handler;
         request_handlers["/dbtest"] = &dbtest_handler;
         request_handlers["/login"] = &login_handler;
+        request_handlers["/register"] = &register_handler;
 
         if (argc != 3) {
             std::cerr << "Usage: " << argv[0] << " <from> <to>\n"
@@ -55,35 +55,40 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        m2pp::connection conn(sender_id, argv[1], argv[2]);
-
-        std::cout << "== starting db connection pool ==" << std::endl;
-        if(!init_soci()){
-            std::cout << "== starting db connection pool failed ==" << std::endl;
+        if(curl_global_init(CURL_GLOBAL_ALL)!=0){
+            pantheios::log_CRITICAL("Curl init failed");
             return 1;
         }
-        create_tables();
-        std::cout << "== starting server ==" << std::endl;
+
+        pantheios::log_INFORMATIONAL("== starting db connection pool ==");
+        if(!init_soci()){
+            pantheios::log_CRITICAL("== starting db connection pool failed ==");
+            return 1;
+        }
+
+        Post::create_table();
+        User::create_table();
+
+        m2pp::connection conn(sender_id, argv[1], argv[2]);
+        pantheios::log_INFORMATIONAL("== starting server ==");
         int handled = 0;
         while (1) {
             m2pp::request req = conn.recv();
-
             if (req.disconnect) {
-                std::cout << "== disconnect ==" << std::endl;
+                pantheios::log_INFORMATIONAL("== disconnect ==");
                 continue;
             }
 
             std::ostringstream response;
-            response << "<pre>" << std::endl;
-            response << "SENDER: " << req.sender << std::endl;
-            response << "IDENT: " << req.conn_id << std::endl;
-            response << "PATH: " << req.path << std::endl;
-            response << "BODY: " << req.body << std::endl;
+            pantheios::log_DEBUG( "<pre>");
+            pantheios::log_DEBUG( "SENDER: ", req.sender );
+            pantheios::log_DEBUG( "IDENT: " , req.conn_id );
+            pantheios::log_DEBUG( "PATH: " , req.path);
+            pantheios::log_DEBUG( "BODY: " , req.body );
             for( auto header:req.headers){
-                response << "HEADER: " << header.first << ": " << header.second << std::endl;
+                pantheios::log_DEBUG("HEADER: ", header.first, ": ", header.second);
             }
-            response << "</pre>" << std::endl;
-            std::cout << response.str();
+            pantheios::log_DEBUG( "</pre>");
             handled = 0;
             for(auto handler: request_handlers){
                 std::regex rx(handler.first);
@@ -95,12 +100,12 @@ int main(int argc, char *argv[])
                 }
             }
             if(handled==0){
-                std::cout << "No handler found:"<< req.path << std::endl;
+                pantheios::log_WARNING("No handler found:", req.path);
                 conn.reply_http(req, std::string("No handler found"));
             }
 
         }
-        std::cout << "Done serving:"<< std::endl;
+        pantheios::log_INFORMATIONAL("Done serving:");
         return 0;
     }
     catch(std::bad_alloc&){

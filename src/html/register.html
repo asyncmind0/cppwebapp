@@ -1,0 +1,13 @@
+{{#REGISTER_FORM}}
+<form action="/register" method="post">
+    First name: <input type="text" name="firstname" /><br />
+    Last name: <input type="text" name="lastname" /><br />
+    <br>
+    User name: <input type="text" name="userid" /><br />
+    Password: <input type="password" name="pwd" /><br />
+    <input type="submit" value="Submit" />
+</form>
+{{/REGISTER_FORM}}
+{{#REGISTER_MESSAGE}}
+<b> Registration {{REGISTER_STATUS}}</b>
+{{/REGISTER_MESSAGE}}

@@ -24,7 +24,7 @@ env.SharedLibrary('build/lib/libMPFDParser.so',
 
 env.Program('build/main',
             ['src/cpp/main.cpp',],
-            LIBS=['cjango','m2pp','zmq','json',
+            LIBS=['m2pp','zmq','json',
                   'pthread','m','rt','pq',
                   'httplib','boost_system', 'boost_regex',
                   'MPFDParser', 'curl',
@@ -34,13 +34,13 @@ env.Program('build/main',
                   'pantheios.1.fe.all.gcc46.file64bit',
                   'pantheios.1.util.gcc46.file64bit',
                   'soci_core',
-                  'soci_postgresql'
+                  'soci_postgresql',
+                  'ctemplate'
                   ],
             LIBPATH=['.'])
 
 Repository(['build/lib/',
             'lib/mongrel2-cpp/',
-            'lib/cjango',
             'lib/httplib',
             '/usr/lib/pantheios',
             ])

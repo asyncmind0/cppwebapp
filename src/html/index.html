@@ -1,17 +1,13 @@
-{% extends "base.html" %}
-{% block contents %}
-My first name is {{ first_name }}. My last name is {{ last_name }}.
+My first name is {{FIRST_NAME}}. My last name is {{LAST_NAME}}.
 
 <form action="/login" method="post">
-    First name: <input type="text" name="firstname" /><br />
-    Last name: <input type="text" name="lastname" /><br />
-    Password: <input type="password" name="pwd" /><br />
+    Userid: <input type="text" name="userid" /><br />
+    Password: <input type="password" name="password" /><br />
     <input type="submit" value="Submit" />
 </form>
+<a href="/register"> register</a>
 <ol>
-  {{ posts.title }}
-  {% for post in posts %}
-  <li>{{ post.title }}</li>
-  {% endfor %}
+  {{#POSTS}}
+  <li>{{TITLE}}</li>
+  {{/POSTS}}
 </ol>
-{% endblock %}
