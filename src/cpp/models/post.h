@@ -40,7 +40,7 @@ Post(std::string title, std::string body, std::string uuid,std::tm created_datet
     static int get_all(std::list<Post> &posts){
         try{
             soci::session sql(pool);
-            std::cout << "We have " << get_row_count("blog_posts", sql) << " entries in the blog.\n";
+            //std::cout << "We have " << get_row_count("blog_posts", sql) << " entries in the blog.\n";
             soci::rowset<Post> rs = (sql.prepare << "select * from blog_posts");
             for(auto it:rs)
                 posts.push_back(it);

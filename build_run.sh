@@ -1,6 +1,7 @@
-cd lib/cjango
-scons || exit
-cd ../../
+#!/bin/sh -x
+#cd lib/cjango
+#scons || exit
+#cd ../../
 
 scons -j3&& \
 #LD_LIBRARY_PATH=build/lib/:lib/cjango/ gdb --args build/main 'tcp://127.0.0.1:9997' 'tcp://127.0.0.1:9996'

@@ -19,6 +19,7 @@
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
+    <link rel="stylesheet" href="{{STATIC_PREFIX}}css/screen.css">
     <link rel="stylesheet" href="{{STATIC_PREFIX}}css/style.css">
 
     <!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
@@ -26,7 +27,7 @@
     <!-- All JavaScript at the bottom, except this Modernizr build.
          Modernizr enables HTML5 elements & feature detects for optimal performance.
          Create your own custom Modernizr build: www.modernizr.com/download/ -->
-    <script src="{{STATIC_PREFIX}}js/vendor/modernizr-2.5.3.min.js"></script>
+    <script src="{{STATIC_PREFIX}}javascript/vendor/modernizr-2.5.3.min.js"></script>
 </head>
 <body>
     <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
@@ -36,25 +37,27 @@
     <!-- Add your site or application content here -->
     <section class="wrapper">
       <header>
+        <h1> {{TITLE}} </h1>
       </header>
       <section class="content">
         {{>CONTENT}}
       </section>
       <aside class="sidebar">
       </aside>
-      </footer>
+      <footer>
       {{FOOTER}}
       </footer>
     </section>
     <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="{{STATIC_PREFIX}}js/vendor/jquery-1.7.2.min.js"><\/script>')</script>
+    <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="{{STATIC_PREFIX}}javascript/vendor/jquery-1.7.2.min.js"><\/script>')</script>-->
+      <script src="{{STATIC_PREFIX}}javascript/vendor/jquery-1.7.2.min.js"></script>
 
     <!-- scripts concatenated and minified via build script -->
-    <script src="{{STATIC_PREFIX}}js/plugins.js"></script>
-    <script src="{{STATIC_PREFIX}}js/main.js"></script>
+    <script src="{{STATIC_PREFIX}}javascript/plugins.js"></script>
+    <script src="{{STATIC_PREFIX}}javascript/main.js"></script>
     <!-- end scripts -->
 
     <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

@@ -9,7 +9,7 @@ void index_handler(m2pp::request& req, m2pp::connection& conn ){
     ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("CONTENT");
     content_dict->SetFilename("index.html");
     content_dict->SetValue("FIRST_NAME","Steven");
-    content_dict->SetValue("LAST_NAME","Steven");
+    content_dict->SetValue("LAST_NAME","Joseph");
     std::list<Post> posts;
     Post::get_all(posts);
     for(auto it:posts){

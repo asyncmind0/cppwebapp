@@ -1,7 +1,11 @@
-mkdir -p var/mongrel/run
-mkdir -p var/mongrel/log
-mkdir -p var/mongrel/tmp
-mkdir -p var/mongrel/proc 
-mount --bind /proc var/mongrel/proc
+mkdir -p var/run
+mkdir -p var/log
+mkdir -p var/tmp
+mkdir -p var/proc 
+mkdir -p var/static/javascript 
+umount var/proc
+umount var/static/javascript
+mount --bind /proc var/proc
+mount --bind src/javascript var/static/javascript/
 m2sh load -config etc/site.conf  --db var/site.sqlite
 m2sh start  -host localhost -sudo --db var/site.sqlite

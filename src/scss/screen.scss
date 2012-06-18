@@ -6,7 +6,7 @@
 $ninesixty-columns: 24;
 .wrapper {
     @include grid-container;
-    header.main, footer.main {
+    header, footer{
         @include grid(24); }
     #sidebar {
         @include grid(4); }

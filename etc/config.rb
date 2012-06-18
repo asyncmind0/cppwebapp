@@ -6,7 +6,7 @@ require 'ninesixty'
 http_path = "/"
 css_dir = "var/static/css"
 sass_dir = "src/scss"
-images_dir = "var/static/images"
+images_dir = "static/images"
 javascripts_dir = "src/javascripts"
 
 # You can select your preferred output style here (can be overridden via the command line):

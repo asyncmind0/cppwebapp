@@ -1,3 +1,4 @@
+
 env = Environment(
     CPPPATH = ['lib/mongrel2-cpp/lib',
                'lib/',
@@ -15,19 +16,19 @@ env = Environment(
 env.SharedLibrary('build/lib/libhttplib.so',
                   ['lib/httplib/src/httplib.cpp'])
 
-env.SharedLibrary('build/lib/libMPFDParser.so',
-                  [
-        'lib/MPFDParser-0.1.1/Parser.cpp',
-        'lib/MPFDParser-0.1.1/Field.cpp',
-        'lib/MPFDParser-0.1.1/Exception.cpp',
-                   ])
+#env.SharedLibrary('build/lib/libMPFDParser.so',
+#                  [
+#        'lib/MPFDParser-0.1.1/Parser.cpp',
+#        'lib/MPFDParser-0.1.1/Field.cpp',
+#        'lib/MPFDParser-0.1.1/Exception.cpp',
+#                   ])
 
 env.Program('build/main',
             ['src/cpp/main.cpp',],
             LIBS=['m2pp','zmq','json',
                   'pthread','m','rt','pq',
                   'httplib','boost_system', 'boost_regex',
-                  'MPFDParser', 'curl',
+                  'curl',
                   'pantheios.1.core.gcc46.file64bit',
                   'pantheios.1.be.fprintf.gcc46.file64bit',
                   'pantheios.1.bec.fprintf.gcc46.file64bit',
@@ -35,6 +36,7 @@ env.Program('build/main',
                   'pantheios.1.util.gcc46.file64bit',
                   'soci_core',
                   'soci_postgresql',
+                  #'MPFDParser', 
                   'ctemplate'
                   ],
             LIBPATH=['.'])

@@ -1,5 +1,5 @@
 [submodule "html5-boilerplate"]
-	path = lib/html5-boilerplate
+	path = html5-boilerplate
 	url = http://github.com/h5bp/html5-boilerplate
 [submodule "lib/mongrel2-cpp"]
 	path = lib/mongrel2-cpp
@@ -7,3 +7,6 @@
 [submodule "lib/httplib"]
 	path = lib/httplib
 	url = https://github.com/jlsandell/httplib.git
+[submodule "lib/html5-boilerplate"]
+	path = lib/html5-boilerplate
+	url = http://github.com/h5bp/html5-boilerplate

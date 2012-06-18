@@ -1,13 +1,17 @@
-My first name is {{FIRST_NAME}}. My last name is {{LAST_NAME}}.
+<h2>My first name is {{FIRST_NAME}}. My last name is {{LAST_NAME}}.</h2>
 
+<p>
 <form action="/login" method="post">
     Userid: <input type="text" name="userid" /><br />
     Password: <input type="password" name="password" /><br />
     <input type="submit" value="Submit" />
 </form>
 <a href="/register"> register</a>
+</p>
+<p>
 <ol>
   {{#POSTS}}
   <li>{{TITLE}}</li>
   {{/POSTS}}
 </ol>
+</p>
