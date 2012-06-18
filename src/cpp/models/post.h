@@ -31,9 +31,9 @@ Post(std::string title, std::string body, std::string uuid,std::tm created_datet
             soci::session sql(pool);
             sql << "create table blog_posts (title varchar(200), body varchar(500), uuid varchar(100), createdtime timestamp);";
         }catch (std::exception const &e){
-            pantheios::log_ERROR("db error:", e);
+            log_ERROR("db error:", e);
         }catch(...){
-            pantheios::log_ERROR("unknown db error");
+            log_ERROR("unknown db error");
         }
         return 1;
     }
@@ -45,9 +45,9 @@ Post(std::string title, std::string body, std::string uuid,std::tm created_datet
             for(auto it:rs)
                 posts.push_back(it);
         }catch (std::exception const &e){
-            pantheios::log_ERROR("db error:", e);
+            log_ERROR("db error:", e);
         }catch(...){
-            pantheios::log_ERROR("unknown db error");
+            log_ERROR("unknown db error");
         }
         return 0;
     }
@@ -61,7 +61,7 @@ Post(std::string title, std::string body, std::string uuid,std::tm created_datet
         }catch (std::exception const &e){
             std::cerr << "Error: " << e.what() << '\n';
         }catch(...){
-            pantheios::log_ERROR("db error");
+            log_ERROR("db error");
         }
         return 0;
         return 0;

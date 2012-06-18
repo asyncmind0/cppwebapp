@@ -32,9 +32,9 @@ User(std::string id, std::string firstname, std::string lastname, std::string pa
             soci::session sql(pool);
             sql << "create table blog_users (id varchar(10) NOT NULL PRIMARY KEY, firstname varchar(100), lastname varchar(100), password varchar(8), createdtime timestamp);";
         }catch (std::exception const &e){
-            pantheios::log_ERROR("db error:", e);
+            log_ERROR("db error:", e);
         }catch(...){
-            pantheios::log_ERROR("unknown db error");
+            log_ERROR("unknown db error");
         }
         return 1;
     }
@@ -46,9 +46,9 @@ User(std::string id, std::string firstname, std::string lastname, std::string pa
             for(auto it:rs)
                 users.push_back(it);
         }catch (std::exception const &e){
-            pantheios::log_ERROR("db error:", e);
+            log_ERROR("db error:", e);
         }catch(...){
-            pantheios::log_ERROR("unknown db error");
+            log_ERROR("unknown db error");
         }
         return 0;
     }
@@ -58,7 +58,7 @@ User(std::string id, std::string firstname, std::string lastname, std::string pa
             soci::session sql(pool);
             int count;
             sql << "insert into blog_users(id, firstname, lastname, password, createdtime) values(:id, :firstname, :lastname, :password, :createdtime)", soci::use(p);
-            pantheios::log_DEBUG("We have inserted user");
+            log_DEBUG("We have inserted user");
             return 1;
         }catch (std::exception const &e){
             std::string what = e.what();
@@ -66,7 +66,7 @@ User(std::string id, std::string firstname, std::string lastname, std::string pa
             if(what.find("unique") != std::string::npos)
                 return 2;
         }catch(...){
-            pantheios::log_ERROR("db error");
+            log_ERROR("db error");
         }
         return 0;
     }

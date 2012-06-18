@@ -12,9 +12,6 @@
 #include "MPFDParser-0.1.1/Field.h"
 #include <curl/curl.h>
 #include <ctemplate/template.h>
-#include <pantheios/pantheios.hpp>
-#include <pantheios/inserters.hpp>  // Pantheios inserter classes
-
 
 static std::vector<m2pp::header> default_headers = {{"Content-Type","text/html"},};
 
@@ -26,11 +23,8 @@ ctemplate::TemplateDictionary* base_template_variables(ctemplate::TemplateDictio
     dict->SetValue("STATIC_PREFIX", "/static/");
     return dict;
 }
-    
 
-template <typename OutIt>
-OutIt split(const std::string &text, char sep, OutIt out)
-{
+template <typename OutIt> OutIt split(const std::string &text, char sep, OutIt out){
     size_t start = 0, end=0;
     while((end = text.find(sep, start)) != std::string::npos)
     {
@@ -40,6 +34,7 @@ OutIt split(const std::string &text, char sep, OutIt out)
     *out++ = text.substr(start);
     return out;
 }
+
 std::unordered_map<std::string, std::string> getFormFields(std::string& form_data){
     CURL *curl = curl_easy_init( );
     std::unordered_map<std::string, std::string> form_fields;
@@ -58,6 +53,7 @@ std::unordered_map<std::string, std::string> getFormFields(std::string& form_dat
     }
     return form_fields;
 }
+
 std::map<std::string,MPFD::Field *> getFormFields(const char* form_data, const std::string content_type){
     try {
         std::cout << "init parser" <<std::endl;
@@ -85,7 +81,7 @@ std::map<std::string,MPFD::Field *> getFormFields(const char* form_data, const s
 std::string render_template(const std::string templatefile, ctemplate::TemplateDictionary* dict){
     std::string output;
     bool error_free = ctemplate::ExpandTemplate(templatefile, ctemplate::STRIP_WHITESPACE, dict, &output);
-    pantheios::log_DEBUG("Template rendered:",templatefile,":",pantheios::boolean(error_free));
+    log_DEBUG("Template rendered:",templatefile,":",pantheios::boolean(error_free));
     return output;
 }
 

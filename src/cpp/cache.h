@@ -8,8 +8,7 @@
 
 #include <libmemcached/memcached.hpp>
 //http://posulliv.github.com/2009/09/19/using-memcached-with-c.html
-class MyCache
-{
+class MyCache{
 public:
 
   static const uint32_t num_of_clients= 10;

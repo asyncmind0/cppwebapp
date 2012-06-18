@@ -9,36 +9,22 @@
 #include <regex>
 #include <future>
 #include <curl/curl.h>
-#include <pantheios/pantheios.hpp>
-#include <pantheios/frontends/stock.h>
-#include <pantheios/inserters/args.hpp>
 
 
 static const std::string templatepath = "src/html/";
 typedef void (*request_handler)(m2pp::request& req, m2pp::connection& conn);
-
+#define __DEBUG__ 1
+#include "logging.h"
 #include "models/post.h"
 #include "models/user.h"
 #include "handlers.h"
 #include "cache.h"
 
-//Specify process identity
-const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "cppwebapp";
-
-
 int main(int argc, char *argv[])
 {
     try
     {
-        pantheios::log(pantheios::debug, "Entering main(", pantheios::args(argc, argv, pantheios::args::arg0FileOnly), ")");
-        pantheios::log_DEBUG("debug");
-        pantheios::log_INFORMATIONAL("informational");
-        pantheios::log_NOTICE("notice");
-        pantheios::log_WARNING("warning");
-        pantheios::log_ERROR("error");
-        pantheios::log_CRITICAL("critical");
-        pantheios::log_ALERT("alert");
-        pantheios::log_EMERGENCY("emergency");
+        log_DEBUG("Entering main(", pantheios::args(argc, argv, pantheios::args::arg0FileOnly), ")");
 
 
         std::string sender_id = "82209006-86FF-4982-B5EA-D1E29E55D481";
@@ -56,13 +42,13 @@ int main(int argc, char *argv[])
         }
 
         if(curl_global_init(CURL_GLOBAL_ALL)!=0){
-            pantheios::log_CRITICAL("Curl init failed");
+            log_CRITICAL("Curl init failed");
             return 1;
         }
 
-        pantheios::log_INFORMATIONAL("== starting db connection pool ==");
+        log_INFORMATIONAL("== starting db connection pool ==");
         if(!init_soci()){
-            pantheios::log_CRITICAL("== starting db connection pool failed ==");
+            log_CRITICAL("== starting db connection pool failed ==");
             return 1;
         }
 
@@ -70,25 +56,25 @@ int main(int argc, char *argv[])
         User::create_table();
 
         m2pp::connection conn(sender_id, argv[1], argv[2]);
-        pantheios::log_INFORMATIONAL("== starting server ==");
+        log_INFORMATIONAL("== starting server ==");
         int handled = 0;
         while (1) {
             m2pp::request req = conn.recv();
             if (req.disconnect) {
-                pantheios::log_INFORMATIONAL("== disconnect ==");
+                log_INFORMATIONAL("== disconnect ==");
                 continue;
             }
 
             std::ostringstream response;
-            pantheios::log_DEBUG( "<pre>");
-            pantheios::log_DEBUG( "SENDER: ", req.sender );
-            pantheios::log_DEBUG( "IDENT: " , req.conn_id );
-            pantheios::log_DEBUG( "PATH: " , req.path);
-            pantheios::log_DEBUG( "BODY: " , req.body );
+            log_DEBUG( "<pre>");
+            log_DEBUG( "SENDER: ", req.sender );
+            log_DEBUG( "IDENT: " , req.conn_id );
+            log_DEBUG( "PATH: " , req.path);
+            log_DEBUG( "BODY: " , req.body );
             for( auto header:req.headers){
-                pantheios::log_DEBUG("HEADER: ", header.first, ": ", header.second);
+                log_DEBUG("HEADER: ", header.first, ": ", header.second);
             }
-            pantheios::log_DEBUG( "</pre>");
+            log_DEBUG( "</pre>");
             handled = 0;
             for(auto handler: request_handlers){
                 std::regex rx(handler.first);
@@ -100,22 +86,22 @@ int main(int argc, char *argv[])
                 }
             }
             if(handled==0){
-                pantheios::log_WARNING("No handler found:", req.path);
+                log_WARNING("No handler found:", req.path);
                 conn.reply_http(req, std::string("No handler found"));
             }
 
         }
-        pantheios::log_INFORMATIONAL("Done serving:");
+        log_INFORMATIONAL("Done serving:");
         return 0;
     }
     catch(std::bad_alloc&){
-        pantheios::log_ALERT("out of memory");
+        log_ALERT("out of memory");
     }
     catch(std::exception& x){
-        pantheios::log_CRITICAL("Exception: ", x);
+        log_CRITICAL("Exception: ", x);
     }
     catch(...){
-        pantheios::puts(pantheios::emergency, "Unknown error");
+        log_EMERGENCY( "Unknown error");
     }
     return 2;
 }
