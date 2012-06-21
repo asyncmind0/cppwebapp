@@ -10,7 +10,6 @@
 #include <future>
 #include <curl/curl.h>
 
-
 static const std::string templatepath = "src/html/";
 typedef void (*request_handler)(m2pp::request& req, m2pp::connection& conn);
 #define __DEBUG__ 1

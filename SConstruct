@@ -1,3 +1,4 @@
+import platform
 
 env = Environment(
     CPPPATH = ['lib/mongrel2-cpp/lib',
@@ -23,22 +24,30 @@ env.SharedLibrary('build/lib/libhttplib.so',
 #        'lib/MPFDParser-0.1.1/Exception.cpp',
 #                   ])
 
-env.Program('build/main',
-            ['src/cpp/main.cpp',],
-            LIBS=['m2pp','zmq','json',
+pantheios_libs = [
+                  'pantheios.1.core.gcc46',
+                  'pantheios.1.be.fprintf.gcc46',
+                  'pantheios.1.bec.fprintf.gcc46',
+                  'pantheios.1.fe.all.gcc46',
+                  'pantheios.1.util.gcc46',
+                  ]
+
+main_libs = ['m2pp','zmq','json',
                   'pthread','m','rt','pq',
                   'httplib','boost_system', 'boost_regex',
                   'curl',
-                  'pantheios.1.core.gcc46.file64bit',
-                  'pantheios.1.be.fprintf.gcc46.file64bit',
-                  'pantheios.1.bec.fprintf.gcc46.file64bit',
-                  'pantheios.1.fe.all.gcc46.file64bit',
-                  'pantheios.1.util.gcc46.file64bit',
                   'soci_core',
                   'soci_postgresql',
                   #'MPFDParser', 
                   'ctemplate'
-                  ],
+                  ]
+
+arch = platform.architecture()[0]
+main_libs.extend([plib+".file64bit" if arch == "64bit" else plib for plib in pantheios_libs])
+
+env.Program('build/main',
+            ['src/cpp/main.cpp',],
+            LIBS=main_libs,
             LIBPATH=['.'])
 
 Repository(['build/lib/',
@@ -46,3 +55,5 @@ Repository(['build/lib/',
             'lib/httplib',
             '/usr/lib/pantheios',
             ])
+
+# vim: ft=python tabstop=8 expandtab shiftwidth=4 softtabstop=4

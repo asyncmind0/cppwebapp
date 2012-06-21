@@ -13,6 +13,7 @@ void index_handler(m2pp::request& req, m2pp::connection& conn ){
     std::list<Post> posts;
     Post::get_all(posts);
     for(auto it:posts){
+        //
         //std::cout << "handler" << it << std::endl;
         ctemplate::TemplateDictionary* post_dict = content_dict->AddSectionDictionary("POSTS");
         post_dict->SetValue("TITLE", it.title);

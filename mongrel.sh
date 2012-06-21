@@ -3,6 +3,9 @@ mkdir -p var/log
 mkdir -p var/tmp
 mkdir -p var/proc 
 mkdir -p var/static/javascript 
+mkdir -p var/static/css
+chmod g+rwX var/static/css
+chown :users var/static/css
 umount var/proc
 umount var/static/javascript
 mount --bind /proc var/proc
