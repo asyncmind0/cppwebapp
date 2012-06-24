@@ -1,6 +1,9 @@
 //main css
 @import "compass/reset";
 @import "compass/typography";
+@import "blueprint/form";
+//@import "page-styles";
+@import "fancy-buttons";
 
 @include global-reset;
 
@@ -19,3 +22,20 @@ h5 {@include adjust-font-size-to(18px)}
 
 p {@include leader; @include trailer;}
 h2.important {@include leader(2); @include trailer(2)}
+
+#loginform{
+    float:right;
+    @include blueprint-form;
+    label{
+        margin-bottom:5px;}}
+
+
+button, a.btn{
+    @include fb-reset;
+    margin-right:3px;
+    @include fancy-button-colors-matte(#124c89, adjust-hue(#124c89, -120), darken(adjust-hue(#124c89, -120), 6));}
+
+.login{
+    @include fancy-button-structure(16px, 4px, 2px);}
+.register{
+    @include fancy-button-structure(14px, 4px, 2px);}

@@ -40,6 +40,7 @@ std::unordered_map<std::string, std::string> getFormFields(std::string& form_dat
     CURL *curl = curl_easy_init( );
     std::unordered_map<std::string, std::string> form_fields;
     std::vector<std::string> pairs;
+    std::replace( form_data.begin(), form_data.end(), '+', ' ');
     split(form_data, '&', std::back_inserter(pairs));
     for(auto a:pairs){
         std::vector<std::string> vals;

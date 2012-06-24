@@ -27,9 +27,8 @@ User(std::string id, std::string firstname, std::string lastname, std::string pa
       ostr << "password:" << user.password << std::endl;
       ostr << "created_datetime:" << asctime(&user.created_datetime) << std::endl;
     }
-    static int create_table(){
+    static int create_table(soci::session &sql){
         try{
-            soci::session sql(pool);
             sql << "create table blog_users (id varchar(10) NOT NULL PRIMARY KEY, firstname varchar(100), lastname varchar(100), password varchar(8), createdtime timestamp);";
         }catch (std::exception const &e){
             log_ERROR("db error:", e);
@@ -38,9 +37,8 @@ User(std::string id, std::string firstname, std::string lastname, std::string pa
         }
         return 1;
     }
-    static int get_all(std::list<User> &users){
+    static int get_all(soci::session &sql, std::list<User> &users){
         try{
-            soci::session sql(pool);
             std::cout << "We have " << get_row_count("blog_users", sql) << " entries in the blog.\n";
             soci::rowset<User> rs = (sql.prepare << "select * from blog_users");
             for(auto it:rs)
@@ -53,9 +51,8 @@ User(std::string id, std::string firstname, std::string lastname, std::string pa
         return 0;
     }
 
-    static int create(User& p){
+    static int create(soci::session &sql, User& p){
         try{
-            soci::session sql(pool);
             int count;
             sql << "insert into blog_users(id, firstname, lastname, password, createdtime) values(:id, :firstname, :lastname, :password, :createdtime)", soci::use(p);
             log_DEBUG("We have inserted user");

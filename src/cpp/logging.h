@@ -1,11 +1,8 @@
 #ifndef _LOGGER
 #define _LOGGER
-#include <pantheios/pantheios.hpp>
-#include <pantheios/frontends/stock.h>
-#include <pantheios/inserters/args.hpp>
-#include <pantheios/inserters.hpp>  // Pantheios inserter classes
-//Specify process identity
-const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "cppwebapp";
+#define __DEBUG__ 1
+//#define DISABLE_LOGGING  1
+
 #define ENDCOLOR "\e[m"
 #define RED "\e[0;31m"
 #define GREEN "\e[0;32m"
@@ -20,6 +17,23 @@ const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "cppwebapp";
 #define LIGHTCYAN "\e[1;36m"
 #define LIGHTPURPLE "\e[1;35m"
 #define LIGHTBROWN "\e[1;33m"
+
+#ifdef DISABLE_LOGGING
+#define log_DEBUG(...) 
+#define log_WARNING(...)
+#define log_INFORMATIONAL(...)
+#define log_NOTICE(...)
+#define log_ERROR(...)
+#define log_CRITICAL(...)
+#define log_ALERT(...)
+#define log_EMERGENCY(...)
+#else
+#include <pantheios/pantheios.hpp>
+#include <pantheios/frontends/stock.h>
+#include <pantheios/inserters/args.hpp>
+#include <pantheios/inserters.hpp>  // Pantheios inserter classes
+//Specify process identity
+const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "cppwebapp";
 
 #ifdef __DEBUG__
 #define log_DEBUG(...) pantheios::log_DEBUG(GREEN,__func__,"(): ", __VA_ARGS__,ENDCOLOR)
@@ -37,4 +51,5 @@ const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "cppwebapp";
 #define log_ALERT(...) pantheios::log_ALERT(LIGHTRED,LOG_PREFIX, __VA_ARGS__,ENDCOLOR)
 #define log_EMERGENCY(...) pantheios::log_EMERGENCY(LIGHTRED,LOG_PREFIX, __VA_ARGS__,ENDCOLOR)
 
+#endif
 #endif

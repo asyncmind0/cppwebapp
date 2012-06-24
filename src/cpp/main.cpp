@@ -1,24 +1,37 @@
-#include <zmq.hpp>
-#include <cstring>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <unordered_map>
-#include <m2pp.hpp>
-#include <regex>
-#include <future>
-#include <curl/curl.h>
-
-static const std::string templatepath = "src/html/";
-typedef void (*request_handler)(m2pp::request& req, m2pp::connection& conn);
-#define __DEBUG__ 1
-#include "logging.h"
+#include "basehandler.h"
 #include "models/post.h"
 #include "models/user.h"
-#include "handlers.h"
 #include "cache.h"
 
+static const std::string templatepath = "src/html/";
+static std::unordered_map<std::string,void*> handler_lib_map;
+
+int reload_handler(const char* name, std::unordered_map<std::string, request_handler> &request_handlers){
+    //http://stackoverflow.com/questions/496664/c-dynamic-shared-library-on-linux
+
+    pantheios::uninit();
+    auto found = handler_lib_map.find(name);
+    if(found != handler_lib_map.end()){
+        try{
+            std::cout << RED << "Found previous handlers " << found->first << ":" << typeid(found->second).name() << ENDCOLOR <<std::endl;
+            dlclose(found->second);
+        }catch(...){
+            std::cout << RED << "Failed to unload cleanly" ENDCOLOR << std::endl;
+        }
+    }
+    std::cout << RED << "loading new handlers" ENDCOLOR << std::endl;
+    void* handle = dlopen(name, RTLD_LAZY);
+    if (!handle)
+    {
+        fprintf(stderr, LIGHTRED "Loading handlers: %s\n" ENDCOLOR, dlerror());
+        exit(1);
+    }
+    handler_lib_map[name] = handle;
+    char *error;
+    handler_initializer handler =  (handler_initializer)dlsym(handle,"init_handler");
+    (*handler)(request_handlers);
+    pantheios::init();
+}
 int main(int argc, char *argv[])
 {
     try
@@ -28,10 +41,7 @@ int main(int argc, char *argv[])
 
         std::string sender_id = "82209006-86FF-4982-B5EA-D1E29E55D481";
         std::unordered_map<std::string, request_handler> request_handlers;
-        request_handlers["/"] = &index_handler;
-        request_handlers["/dbtest"] = &dbtest_handler;
-        request_handlers["/login"] = &login_handler;
-        request_handlers["/register"] = &register_handler;
+        reload_handler("libhandlers.so", request_handlers);
 
         if (argc != 3) {
             std::cerr << "Usage: " << argv[0] << " <from> <to>\n"
@@ -45,14 +55,16 @@ int main(int argc, char *argv[])
             return 1;
         }
 
+        soci::connection_pool *pool = init_soci();
         log_INFORMATIONAL("== starting db connection pool ==");
-        if(!init_soci()){
+        if(pool == nullptr){
             log_CRITICAL("== starting db connection pool failed ==");
             return 1;
         }
 
-        Post::create_table();
-        User::create_table();
+        soci::session sql(*pool);
+        Post::create_table(sql);
+        User::create_table(sql);
 
         m2pp::connection conn(sender_id, argv[1], argv[2]);
         log_INFORMATIONAL("== starting server ==");
@@ -75,11 +87,19 @@ int main(int argc, char *argv[])
             }
             log_DEBUG( "</pre>");
             handled = 0;
+            if(req.path == "/reload_libs"){
+                reload_handler("libhandlers.so", request_handlers);
+                log_WARNING("Reloaded handlers");
+                conn.reply_http(req, std::string("Reloaded handlers."));
+                continue;
+            }
             for(auto handler: request_handlers){
                 std::regex rx(handler.first);
-                if(regex_match(req.path,rx) == 1){
+                std::smatch result;
+                if(std::regex_match(req.path,result,rx)){
+                    request_args r (req,conn,*pool,result);
                     auto result = std::async(std::launch::async,
-                                             *handler.second,std::ref(req), std::ref(conn));
+                                             *handler.second,std::ref(r));
                     handled = 1;
                     break;
                 }

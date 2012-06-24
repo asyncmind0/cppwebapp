@@ -1,4 +1,8 @@
 import platform
+AddOption('--handlers',
+          dest='handlers',
+          action='store_true',
+          help='rebuild only handlers')
 
 env = Environment(
     CPPPATH = ['lib/mongrel2-cpp/lib',
@@ -10,9 +14,10 @@ env = Environment(
                '/usr/include/soci/',
                ],
     CCFLAGS=["-std=gnu++0x",
-             "-g", "-O0",
+             "-g", "-O0","-fPIC",
              "-D_LARGEFILE_SOURCE",
-             "-D_FILE_OFFSET_BITS=64"])
+             "-D_FILE_OFFSET_BITS=64"],
+             LINKFLAGS=["-fPIC"])
 
 env.SharedLibrary('build/lib/libhttplib.so',
                   ['lib/httplib/src/httplib.cpp'])
@@ -23,6 +28,9 @@ env.SharedLibrary('build/lib/libhttplib.so',
 #        'lib/MPFDParser-0.1.1/Field.cpp',
 #        'lib/MPFDParser-0.1.1/Exception.cpp',
 #                   ])
+
+
+
 
 pantheios_libs = [
                   'pantheios.1.core.gcc46',
@@ -39,13 +47,22 @@ main_libs = ['m2pp','zmq','json',
                   'soci_core',
                   'soci_postgresql',
                   #'MPFDParser', 
-                  'ctemplate'
+                  'ctemplate',
+                  'dl',
+             'uuid'
                   ]
-
 arch = platform.architecture()[0]
 main_libs.extend([plib+".file64bit" if arch == "64bit" else plib for plib in pantheios_libs])
 
-env.Program('build/main',
+if GetOption('handlers'):
+    env.SharedLibrary('build/lib/libhandlers.so',
+                  ['src/cpp/handlers/handlers.cpp'],
+                  CC='-fPIC',
+                  LIBS=main_libs,
+                  LIBPATH=['.'])
+
+if not GetOption('handlers'):
+    env.Program('build/main',
             ['src/cpp/main.cpp',],
             LIBS=main_libs,
             LIBPATH=['.'])

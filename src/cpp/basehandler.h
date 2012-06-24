@@ -1,17 +1,39 @@
 #ifndef _BASEHANDLER
 #define _BASEHANDLER 
+#include "logging.h"
+#include <zmq.hpp>
+#include <sstream>
+#include <fstream>
+#include <m2pp.hpp>
+#include <regex>
+#include <future>
+#include <curl/curl.h>
+#include <dlfcn.h>
+#include <unordered_map>
 #include <cstring>
 #include <string>
 #include <iostream>
-#include <sstream>
-#include <fstream>
 #include <map>
-#include "m2pp.hpp"
 #include "form.h"
-#include <curl/curl.h>
 #include <ctemplate/template.h>
+#include <soci/soci.h>
 
+typedef struct _request_args_ {
+    soci::connection_pool &db_pool;
+    m2pp::request &req;
+    m2pp::connection &conn;
+    //std::match_results<std::string::const_iterator> &args;
+    std::smatch &args;
+_request_args_(m2pp::request &req, m2pp::connection &conn, soci::connection_pool &pool,std::smatch &args)
+: db_pool(pool),req(req),conn(conn),args(args){
+}
+    
+} request_args;
+
+typedef void (*request_handler)(request_args &req_args);
+typedef int (*handler_initializer)(std::unordered_map<std::string, request_handler> &request_handlers_map);
 static std::vector<m2pp::header> default_headers = {{"Content-Type","text/html"},};
+
 
 ctemplate::TemplateDictionary* base_template_variables(ctemplate::TemplateDictionary *dict){
     ctemplate::Template::SetTemplateRootDirectory("src/html");
@@ -38,4 +60,7 @@ const std::string header_value(std::vector<m2pp::header> headers, std::string ke
     }
     return "";
 }
+
+
+    
 #endif

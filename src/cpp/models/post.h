@@ -8,27 +8,32 @@ class Post
 public:
     std::string title;
     std::string body;
-    std::string uuid;
+    uuid_t uuid;
     std::tm created_datetime;
 
     Post(){
     }
+Post(std::string title, std::string body):title(title),body(body){
+    time_t now = time(NULL);
+    created_datetime = *localtime(&now);
+    uuid_generate(uuid);
+    }
 
-Post(std::string title, std::string body, std::string uuid,std::tm created_datetime)
-    :title(title), body(body), uuid(uuid), created_datetime(created_datetime)
+Post(std::string title, std::string body, uuid_t u,std::tm created_datetime)
+    :title(title), body(body),  created_datetime(created_datetime)
     {
+        uuid_copy(uuid, u);
     }
     ~Post(){
     }
     friend std::ostream& operator<<(std::ostream& ostr, const Post& post){
-      ostr << "uuid:" << post.uuid << std::endl;
+        //ostr << "uuid:" << post.uuid << std::endl;
       ostr << "title:" << post.title << std::endl;
       ostr << "body:" << post.body << std::endl;
       ostr << "created_datetime:" << asctime(&post.created_datetime) << std::endl;
     }
-    static int create_table(){
+    static int create_table(soci::session &sql){
         try{
-            soci::session sql(pool);
             sql << "create table blog_posts (title varchar(200), body varchar(500), uuid varchar(100), createdtime timestamp);";
         }catch (std::exception const &e){
             log_ERROR("db error:", e);
@@ -37,9 +42,8 @@ Post(std::string title, std::string body, std::string uuid,std::tm created_datet
         }
         return 1;
     }
-    static int get_all(std::list<Post> &posts){
+    static int get_all(soci::session &sql, std::list<Post> &posts){
         try{
-            soci::session sql(pool);
             //std::cout << "We have " << get_row_count("blog_posts", sql) << " entries in the blog.\n";
             soci::rowset<Post> rs = (sql.prepare << "select * from blog_posts");
             for(auto it:rs)
@@ -52,9 +56,8 @@ Post(std::string title, std::string body, std::string uuid,std::tm created_datet
         return 0;
     }
 
-    static int create(Post& p){
+    static int create(soci::session &sql, Post& p){
         try{
-            soci::session sql(pool);
             int count;
             sql << "insert into blog_posts(uuid, title, body, createdtime) values(:uuid, :title, :body, :createdtime)", soci::use(p);
             std::cout << "We have inserted post" << std::endl;
@@ -70,7 +73,9 @@ Post(std::string title, std::string body, std::string uuid,std::tm created_datet
     {
         std::vector<char> raw_product(sizeof(Post));
         memcpy(&raw_product[0], &post, sizeof(Post));
-        MyCache::singleton().set(post.uuid, raw_product);
+            char uuid_str[37];
+            uuid_unparse(post.uuid,uuid_str);
+        MyCache::singleton().set(uuid_str, raw_product);
     }
     static Post cache_get(const std::string &key)
     {
@@ -96,7 +101,8 @@ namespace soci
         static void from_base(values const & v, indicator /* ind */, Post & p)
         {
             p.title = v.get<std::string>("title");
-            p.uuid = v.get<std::string>("uuid");
+            std::string uu = v.get<std::string>("uuid");
+            uuid_parse(uu.c_str(),p.uuid); 
             p.body = v.get<std::string>("body");
             p.created_datetime = v.get<std::tm>("createdtime");
 
@@ -117,7 +123,9 @@ namespace soci
         
         static void to_base(const Post & p, values & v, indicator & ind)
         {
-            v.set("uuid", p.uuid);
+            char uuid_str[37];
+            uuid_unparse(p.uuid,uuid_str);
+            v.set("uuid", std::string(uuid_str));
             v.set("title", p.title);
             v.set("body", p.body);
             v.set("createdtime", p.created_datetime); //, p.created_datetime == std::nullptr ? i_null : i_ok);
