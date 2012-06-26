@@ -40,12 +40,23 @@
     <!--[if lt IE 7]><p class="chromeframe">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
     
     <!-- Add your site or application content here -->
-    <section class="wrapper">
+    <section class="wrapper container_24">
       <header>
         <h1> {{TITLE}} </h1>
       </header>
       <section class="content">{{>CONTENT}}</section>
-      <aside class="sidebar">
+      <aside id="sidebar" >
+        <div id="profile">
+          <img src="{{STATIC_PREFIX}}images/jagguli.png" />
+        </div>
+        <form id="loginform" action="/login" method="post">
+          <label for="userid" >Userid:</label><br>
+          <input type="text" name="userid" /><br />
+          <label for="password"> Password:</label><br>
+          <input type="password" name="password" /><br />
+          <a class="btn login" onclick="$('#loginform').submit();">Login</a>
+          <a class="btn register" href="/register" >Register</a>
+        </form>
       </aside>
       <div id="bump"></div>
     </section>

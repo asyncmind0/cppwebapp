@@ -1,16 +1,6 @@
 <h2>Experimantal web app using C++11 features, in a python djangoish way.</h2>
 
 <p>
-<form id="loginform" action="/login" method="post">
-    <label for="userid" >Userid:</label><br>
-    <input type="text" name="userid" /><br />
-    <label for="password"> Password:</label><br>
-    <input type="password" name="password" /><br />
-    <a class="btn login" onclick="$('#loginform').submit();">Login</a>
-    <a class="btn register" href="/register" >Register</a>
-</form>
-</p>
-<p>
 <ol>
   {{#POSTS}}
   <li><h3>{{TITLE}}</h3> <a href="/editpost/{{ID}}/">edit</a> <a href="/deletepost/{{ID}}/">delete</a></li>

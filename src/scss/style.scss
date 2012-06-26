@@ -3,6 +3,7 @@
 @import "compass/typography";
 @import "blueprint/form";
 //@import "page-styles";
+@import "960/grid";
 @import "fancy-buttons";
 
 @include global-reset;
@@ -24,8 +25,8 @@ p {@include leader; @include trailer;}
 h2.important {@include leader(2); @include trailer(2)}
 
 #loginform{
-    float:right;
     @include blueprint-form;
+    @include blueprint-form-sizes(250px);
     label{
         margin-bottom:5px;}}
 

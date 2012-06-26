@@ -2,22 +2,25 @@
 @import "960/grid";
 @import "compass/layout.scss";
 // The following generates the default grids provided by the css version of 960.g
-.container_12 {
-    @include grid-system(12); }
+.container_24 {
+    @include grid-system(24); }
+
 $ninesixty-columns: 24;
+
 .wrapper {
     @include grid-container;
     header, footer{
         @include grid(24); }
     #sidebar {
-        @include grid(4); }
+        @include grid(8); }
     .content {
-        @include grid(20); }}
+        @include grid(16); }}
+
 @include sticky-footer(92px, "#wrapper", "#bump", "footer");
 
-html, body{
+/*html, body{
     height:100%;
-    }
+    }*/
 footer{
     text-align:center;
     }

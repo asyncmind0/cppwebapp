@@ -24,6 +24,7 @@ void index_handler(request_args &r){
     }
     r.conn.reply_http(r.req,render_template("base.html",dict),200,"OK",default_headers);
 }
+
 void edit_handler(request_args &r){
     if(r.args.size()<2){
         r.conn.reply_http(r.req,"Error: no post id specified",403,"OK",default_headers);
@@ -132,7 +133,6 @@ void login_handler(request_args &r){
 }
 
 void dbtest_handler(request_args &r){
-    //test_connection();
     time_t now = time(NULL);
     std::tm *timeinfo = localtime(&now);
     uuid_t uuid;
@@ -155,6 +155,5 @@ extern "C" void init_handler(std::unordered_map<std::string, request_handler> &r
     request_handlers_map["/editpost/(.+)/"] = &edit_handler;
     request_handlers_map["/deletepost/(.+)/"] = &delete_handler;
     std::cout << RED << "Set handlers!!:" <<  ENDCOLOR <<std::endl;
-
 }
 #endif
