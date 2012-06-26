@@ -37,5 +37,6 @@ button, a.btn{
 
 .login{
     @include fancy-button-structure(16px, 4px, 2px);}
+
 .register{
     @include fancy-button-structure(14px, 4px, 2px);}

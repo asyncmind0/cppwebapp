@@ -16,8 +16,6 @@ void index_handler(request_args &r){
     soci::session sql(r.db_pool);
     Post::get_all(sql,posts);
     for(auto it:posts){
-        //
-        //std::cout << "handler" << it << std::endl;
         ctemplate::TemplateDictionary* post_dict = content_dict->AddSectionDictionary("POSTS");
         post_dict->SetValue("TITLE", it.title);
         char uuid_str[37];
@@ -27,6 +25,10 @@ void index_handler(request_args &r){
     r.conn.reply_http(r.req,render_template("base.html",dict),200,"OK",default_headers);
 }
 void edit_handler(request_args &r){
+    if(r.args.size()<2){
+        r.conn.reply_http(r.req,"Error: no post id specified",403,"OK",default_headers);
+        return;
+    }
     static std::vector<m2pp::header> redir_headers = {{"Content-Type","text/html"}};
     int code = 200;
     ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("base"));
@@ -34,10 +36,6 @@ void edit_handler(request_args &r){
     Post *post  = new Post("my c++ blog","I must be mental to write webapplications in c++, a genuine sociopath I am.");
     soci::session sql(r.db_pool);
     std::string uuid;
-    if(r.args.size()<2){
-        r.conn.reply_http(r.req,"error",403,"OK",default_headers);
-        return;
-    }
     uuid = r.args[1].str().substr(1,36);
     if(uuid != "-1/"){
         try{
