@@ -61,6 +61,16 @@ const std::string header_value(std::vector<m2pp::header> headers, std::string ke
     return "";
 }
 
-
+void render_json(request_args& r, std::unordered_map<std::string,std::string> &map){
+    static std::vector<m2pp::header> json_headers = {{"Content-Type","application/json; charset=utf-8"}};
+    std::ostringstream response;
+    response <<"{" ;
+    for( auto item:map){
+        response << "\"" << item.first << "\":\"" << item.second << "\"";
+    }
+    response << "}" ;
+    r.conn.reply_http(r.req,response.str(),200,"OK",json_headers);
+}
+    
     
 #endif

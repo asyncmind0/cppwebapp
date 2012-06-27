@@ -2,7 +2,6 @@
 @import "compass/reset";
 @import "compass/typography";
 @import "blueprint/form";
-//@import "page-styles";
 @import "960/grid";
 @import "fancy-buttons";
 
@@ -30,7 +29,6 @@ h2.important {@include leader(2); @include trailer(2)}
     label{
         margin-bottom:5px;}}
 
-
 button, a.btn{
     @include fb-reset;
     margin-right:3px;
@@ -41,3 +39,4 @@ button, a.btn{
 
 .register{
     @include fancy-button-structure(14px, 4px, 2px);}
+

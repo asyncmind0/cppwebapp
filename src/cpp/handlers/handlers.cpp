@@ -30,11 +30,11 @@ void edit_handler(request_args &r){
         r.conn.reply_http(r.req,"Error: no post id specified",403,"OK",default_headers);
         return;
     }
-    static std::vector<m2pp::header> redir_headers = {{"Content-Type","text/html"}};
+    std::vector<m2pp::header> redir_headers = {{"Content-Type","text/html"}};
     int code = 200;
     ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("base"));
     ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("CONTENT");
-    Post *post  = new Post("my c++ blog","I must be mental to write webapplications in c++, a genuine sociopath I am.");
+    Post *post  = new Post("","");
     soci::session sql(r.db_pool);
     std::string uuid;
     uuid = r.args[1].str().substr(1,36);
@@ -73,11 +73,11 @@ void edit_handler(request_args &r){
 }
 
 void delete_handler(request_args &r){
-    static std::vector<m2pp::header> redir_headers = {{"Content-Type","text/html"},{"Location","/"}};
+    static std::vector<m2pp::header> json_headers = {{"Content-Type","application/json; charset=utf-8"}};
     soci::session sql(r.db_pool);
     std::string id,uuid;
     if(r.args.size()<2){
-        r.conn.reply_http(r.req,"error",403,"OK",redir_headers);
+        r.conn.reply_http(r.req,"error",403,"OK",default_headers);
         return;
     }
     id = r.args[1].str();
@@ -90,7 +90,7 @@ void delete_handler(request_args &r){
     }catch(...){
         log_ERROR("unknown db error");
     }
-    r.conn.reply_http(r.req,"Deleted",303,"OK",redir_headers);
+    render_json(r,*(new std::unordered_map<std::string,std::string>({{"id",uuid}})));
 }
 void register_handler(request_args &r){
     ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("register"));
@@ -147,13 +147,11 @@ void dbtest_handler(request_args &r){
 
 
 extern "C" void init_handler(std::unordered_map<std::string, request_handler> &request_handlers_map){
-    std::cout << RED << "Setting handlers!!:" <<  ENDCOLOR <<std::endl;
     request_handlers_map["/"] = &index_handler;
     request_handlers_map["/dbtest"] = &dbtest_handler;
     request_handlers_map["/login"] = &login_handler;
     request_handlers_map["/register"] = &register_handler;
     request_handlers_map["/editpost/(.+)/"] = &edit_handler;
     request_handlers_map["/deletepost/(.+)/"] = &delete_handler;
-    std::cout << RED << "Set handlers!!:" <<  ENDCOLOR <<std::endl;
 }
 #endif

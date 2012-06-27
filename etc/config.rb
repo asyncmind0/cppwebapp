@@ -1,6 +1,5 @@
 require 'ninesixty'
 require 'fancy-buttons'
-require 'zocial'
 # Require any additional compass plugins here.
 
 

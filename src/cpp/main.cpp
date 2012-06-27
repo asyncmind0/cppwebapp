@@ -75,9 +75,8 @@ int main(int argc, char *argv[])
                 log_INFORMATIONAL("== disconnect ==");
                 continue;
             }
-
-            std::ostringstream response;
-            log_DEBUG( "<pre>");
+            /*
+              log_DEBUG( "<pre>");
             log_DEBUG( "SENDER: ", req.sender );
             log_DEBUG( "IDENT: " , req.conn_id );
             log_DEBUG( "PATH: " , req.path);
@@ -86,6 +85,8 @@ int main(int argc, char *argv[])
                 log_DEBUG("HEADER: ", header.first, ": ", header.second);
             }
             log_DEBUG( "</pre>");
+            */
+            log_DEBUG( req.path);
             handled = 0;
             if(req.path == "/reload_libs"){
                 reload_handler("libhandlers.so", request_handlers);

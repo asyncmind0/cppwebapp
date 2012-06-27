@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from debug import shell, debug as sj_debug
 import os
 import pyinotify
 
