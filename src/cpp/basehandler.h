@@ -14,6 +14,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <list>
 #include "form.h"
 #include <ctemplate/template.h>
 #include <soci/soci.h>
@@ -61,12 +62,29 @@ const std::string header_value(std::vector<m2pp::header> headers, std::string ke
     return "";
 }
 
-void render_json(request_args& r, std::unordered_map<std::string,std::string> &map){
+template <typename T>
+void render_dojo_json(request_args& r, std::unordered_map<std::string,std::string> headers,
+                      std::unordered_map<std::string,T> &items){
+    static std::vector<m2pp::header> json_headers = {{"Content-Type","application/json; charset=utf-8"}};
+    std::ostringstream response;
+    response <<"{" ;
+    for( auto item:headers){
+        response << "\"" << item.first << "\":\"" << item.second << "\",";
+    }
+    response << "\"items\":[";
+    for(auto item:items){
+        response << "{\"" << item.first << "\":\"" << item.second << "\"},";
+    }
+    response << "]}" ;
+    r.conn.reply_http(r.req,response.str(),200,"OK",json_headers);
+}
+template <typename T>
+void render_json(request_args& r, std::unordered_map<std::string,T> &map){
     static std::vector<m2pp::header> json_headers = {{"Content-Type","application/json; charset=utf-8"}};
     std::ostringstream response;
     response <<"{" ;
     for( auto item:map){
-        response << "\"" << item.first << "\":\"" << item.second << "\"";
+        response << "\"" << item.first << "\":\"" << item.second << "\",";
     }
     response << "}" ;
     r.conn.reply_http(r.req,response.str(),200,"OK",json_headers);

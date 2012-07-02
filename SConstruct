@@ -60,8 +60,12 @@ if GetOption('handlers'):
                   CC='-fPIC',
                   LIBS=main_libs,
                   LIBPATH=['.'])
-
-if not GetOption('handlers'):
+    env.SharedLibrary('build/lib/libnutrition.so',
+                  ['src/cpp/handlers/nutrition.cpp'],
+                  CC='-fPIC',
+                  LIBS=main_libs,
+                  LIBPATH=['.'])
+else:
     env.Program('build/main',
             ['src/cpp/main.cpp',],
             LIBS=main_libs,

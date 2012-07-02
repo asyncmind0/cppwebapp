@@ -1,35 +1,39 @@
 #include "basehandler.h"
 #include "models/post.h"
 #include "models/user.h"
+#include "models/supplement.h"
 #include "cache.h"
 
 static const std::string templatepath = "src/html/";
 static std::unordered_map<std::string,void*> handler_lib_map;
+static std::list<std::string> handler_libs = {"libhandlers.so","libnutrition.so"};
 
-int reload_handler(const char* name, std::unordered_map<std::string, request_handler> &request_handlers){
+int reload_handler(std::list<std::string> handlerlibs,std::unordered_map<std::string, request_handler> &request_handlers){
     //http://stackoverflow.com/questions/496664/c-dynamic-shared-library-on-linux
 
     pantheios::uninit();
-    auto found = handler_lib_map.find(name);
-    if(found != handler_lib_map.end()){
-        try{
-            std::cout << RED << "Found previous handlers " << found->first << ":" << typeid(found->second).name() << ENDCOLOR <<std::endl;
-            dlclose(found->second);
-        }catch(...){
-            std::cout << RED << "Failed to unload cleanly" ENDCOLOR << std::endl;
+    for(std::string name:handlerlibs){
+        auto found = handler_lib_map.find(name);
+        if(found != handler_lib_map.end()){
+            try{
+                std::cout << RED << "Found previous handlers " << found->first << ":" << typeid(found->second).name() << ENDCOLOR <<std::endl;
+                dlclose(found->second);
+            }catch(...){
+                std::cout << RED << "Failed to unload cleanly" ENDCOLOR << std::endl;
+            }
         }
+        std::cout << RED << "loading new handlers" ENDCOLOR << std::endl;
+        void* handle = dlopen(name.c_str(), RTLD_LAZY);
+        if (!handle)
+        {
+            fprintf(stderr, LIGHTRED "Loading handlers: %s\n" ENDCOLOR, dlerror());
+            exit(1);
+        }
+        handler_lib_map[name] = handle;
+        char *error;
+        handler_initializer handler =  (handler_initializer)dlsym(handle,"init_handler");
+        (*handler)(request_handlers);
     }
-    std::cout << RED << "loading new handlers" ENDCOLOR << std::endl;
-    void* handle = dlopen(name, RTLD_LAZY);
-    if (!handle)
-    {
-        fprintf(stderr, LIGHTRED "Loading handlers: %s\n" ENDCOLOR, dlerror());
-        exit(1);
-    }
-    handler_lib_map[name] = handle;
-    char *error;
-    handler_initializer handler =  (handler_initializer)dlsym(handle,"init_handler");
-    (*handler)(request_handlers);
     pantheios::init();
 }
 int main(int argc, char *argv[])
@@ -41,7 +45,7 @@ int main(int argc, char *argv[])
 
         std::string sender_id = "82209006-86FF-4982-B5EA-D1E29E55D481";
         std::unordered_map<std::string, request_handler> request_handlers;
-        reload_handler("libhandlers.so", request_handlers);
+        reload_handler(handler_libs, request_handlers);
 
         if (argc != 3) {
             std::cerr << "Usage: " << argv[0] << " <from> <to>\n"
@@ -65,6 +69,7 @@ int main(int argc, char *argv[])
         soci::session sql(*pool);
         Post::create_table(sql);
         User::create_table(sql);
+        Supplement::create_table(sql);
 
         m2pp::connection conn(sender_id, argv[1], argv[2]);
         log_INFORMATIONAL("== starting server ==");
@@ -89,7 +94,7 @@ int main(int argc, char *argv[])
             log_DEBUG( req.path);
             handled = 0;
             if(req.path == "/reload_libs"){
-                reload_handler("libhandlers.so", request_handlers);
+                reload_handler(handler_libs, request_handlers);
                 log_WARNING("Reloaded handlers");
                 conn.reply_http(req, std::string("Reloaded handlers."));
                 continue;

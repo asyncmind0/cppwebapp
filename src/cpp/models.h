@@ -8,6 +8,7 @@
 #include <exception>
 #include <list>
 #include  <uuid/uuid.h>
+#include "utils.h"
 
 const size_t poolSize = 10;
 static bool soci_pool_initialized = 0;

@@ -18,7 +18,7 @@ def compile_scss(event):
 
 def compile_handlers(event):
     if os.system('scons -j3 --handlers') == 0:
-        print os.system('wget http://localhost:9090/reload_libs -q -T 1 -O-')
+        print os.system('wget http://localhost:9090/reload_libs -q --timeout 1  --tries 1 -O-')
     return 0
     
 
@@ -26,7 +26,7 @@ wm = pyinotify.WatchManager()
 notifier = pyinotify.Notifier(wm)
 
 wm.add_watch(_fullpath(scss_watch), pyinotify.IN_MODIFY| pyinotify.IN_CREATE | pyinotify.IN_MOVED_TO, compile_scss, do_glob=True)
-wm.add_watch(_fullpath(handlers_watch), pyinotify.IN_MODIFY, compile_handlers, do_glob=True)
+wm.add_watch(_fullpath(handlers_watch), pyinotify.IN_MODIFY| pyinotify.IN_CREATE | pyinotify.IN_MOVED_TO, compile_handlers, do_glob=True)
 
 notifier.coalesce_events(True)
 notifier.loop()

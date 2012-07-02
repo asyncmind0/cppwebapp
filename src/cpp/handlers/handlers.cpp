@@ -90,7 +90,9 @@ void delete_handler(request_args &r){
     }catch(...){
         log_ERROR("unknown db error");
     }
-    render_json(r,*(new std::unordered_map<std::string,std::string>({{"id",uuid}})));
+
+    std::unordered_map<std::string,std::string> resp({{"id",uuid}});
+    render_json(r,resp);
 }
 void register_handler(request_args &r){
     ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("register"));

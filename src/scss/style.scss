@@ -40,3 +40,13 @@ button, a.btn{
 .register{
     @include fancy-button-structure(14px, 4px, 2px);}
 
+.form_btn{
+    @include fancy-button-structure(14px, 4px, 2px);}
+    
+
+#macronutrients_form{
+    border:2px black solid;}
+
+span.nutrient{
+    display:block;
+    }
