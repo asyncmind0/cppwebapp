@@ -41,7 +41,7 @@ ctemplate::TemplateDictionary* base_template_variables(ctemplate::TemplateDictio
     dict->SetValue("TITLE", "C++ web dev");
     dict->SetValue("DESCRIPTION", "Steven's first site written using c++11.");
     dict->SetValue("FOOTER", "Aren't these great results?");
-    dict->SetValue("STATIC_PREFIX", "/static/");
+    dict->SetGlobalValue("STATIC_PREFIX", "/static/");
     return dict;
 }
 

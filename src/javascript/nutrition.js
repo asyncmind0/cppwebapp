@@ -5,7 +5,7 @@ require(["dojo","dijit/form/ComboBox", "dojo/data/ItemFileReadStore", "dojo/_bas
             // create store instance
             // referencing data from states.json
             var stateStore = new ItemFileReadStore({
-                url: "nutrition/macronutrients"
+                url: "/nutrition/macronutrients"
             });
 
             // create Select widget,
@@ -34,11 +34,13 @@ require(["dojo","dijit/form/ComboBox", "dojo/data/ItemFileReadStore", "dojo/_bas
                     fx.highlight({node:nutrients_found[0]}).play();
                     fx.highlight({node:nutrients_found[0].parentNode}).play();
                 }else{
+                    var closebtn = dojo.query(".closebtn")[0];
                     var item = dojo.create('span',{
-                        'class':'nutrient',
-                        innerHTML:macronutrient+': <input type="text" name="'+macronutrient+'" value="'+dosage+'" size="50"/>'
-                            +'<img src="{{STATIC_PREFIX}}images/close.png" class="closebtn"></img>'},
+                        innerHTML:macronutrient,
+                        'class':'nutrient'},
                         "macronutrients_form",'last');
+                    dojo.create('input',{type:"text",name:macronutrient,value:dosage,size:"50"},item,'last');
+                    dojo.create('img',{src:closebtn.src,'class':'closebtn'},item,'last');
                     dojo.query(".closebtn",item).on("click", onClose);
                 }
 

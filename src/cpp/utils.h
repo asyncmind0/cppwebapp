@@ -2,6 +2,7 @@
 #define _UTILS
 #include <string>
 #include <json/json.h>
+#include "logging.h"
 template <typename OutIt> OutIt split(const std::string &text, char sep, OutIt out){
     size_t start = 0, end=0;
     while((end = text.find(sep, start)) != std::string::npos)
@@ -15,9 +16,11 @@ template <typename OutIt> OutIt split(const std::string &text, char sep, OutIt o
 void json_loads(const std::string& jsondoc, std::unordered_map<std::string,double> &hdrs) {
 	json_object * jobj = json_tokener_parse(jsondoc.c_str());
 
+        //log_DEBUG(jsondoc);
 	if (jobj && json_object_is_type(jobj, json_type_object)) {
 		json_object_object_foreach(jobj, key, value) {
-			if (key && value && json_object_is_type(value, json_type_double)) {
+			if (key && value && json_object_is_type(value, json_type_string)) {
+                            log_DEBUG(key);
                             hdrs[std::string(key)] = json_object_get_double(value);
 			}
 		}
@@ -28,6 +31,8 @@ void json_loads(const std::string& jsondoc, std::unordered_map<std::string,doubl
 template <typename T>
 void json_loads(const std::string& jsondoc, std::unordered_map<std::string,T> &hdrs) {
 	json_object * jobj = json_tokener_parse(jsondoc.c_str());
+        std::cout<< "JSON_LOADS"<<std::endl;
+        //log_DEBUG(jsondoc);
 
 	if (jobj && json_object_is_type(jobj, json_type_object)) {
 		json_object_object_foreach(jobj, key, value) {

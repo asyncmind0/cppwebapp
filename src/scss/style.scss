@@ -4,6 +4,8 @@
 @import "blueprint/form";
 @import "960/grid";
 @import "fancy-buttons";
+//@import "compass/utilities/sprites/sprite-img";
+@import "compass/css3/images";
 
 @include global-reset;
 
@@ -50,3 +52,11 @@ button, a.btn{
 span.nutrient{
     display:block;
     }
+
+/*.closebtn{
+    border:1px solid;}
+    width:20px;
+    height:20px;}*/
+ //   @include background(image-url("buttons/cross.png"));}
+
+    //@include sprite-img("buttons/cross.png", 1)}

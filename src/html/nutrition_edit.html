@@ -1,4 +1,4 @@
-<form action="/nutrition" method="post">
+<form action="/nutrition/edit/{{ID}}/" method="post">
   <input type="hidden" name="id" value="{{ID}}"/>
   Name: <input type="text" name="name" value="{{NAME}}" size="50"/><br />
   Description:<br>
@@ -21,7 +21,7 @@
     {{#MACRONUTRIENTS}}
     <span class="nutrient">{{NUTRIENT}}: <input type="text" name="{{NUTRIENT}}"
     value="{{DOSAGE}}" size="50"/>
-      <img src="{{STATIC_PREFIX}}images/close.png" class="closebtn"></img>
+      <img src="{{STATIC_PREFIX}}images/buttons/cross.png" class="closebtn"></img>
     </span>
     {{/MACRONUTRIENTS}}
   </div>
@@ -29,4 +29,4 @@
   <input type="submit" value="Submit" />
 </form>
 
-<a href="/">back</a>
+<a href="/nutrition">back</a>

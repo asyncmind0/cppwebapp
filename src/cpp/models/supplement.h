@@ -101,7 +101,6 @@ namespace soci
         typedef values base_type;
         static void from_base(values const & v, indicator /* ind */, Supplement & p)
         {
-            log_DEBUG("from_base");
             p.name = v.get<std::string>("name");
             std::string uu = v.get<std::string>("uuid");
             uuid_parse(uu.c_str(),p.uuid); 
@@ -109,8 +108,8 @@ namespace soci
             p.created_datetime = v.get<std::tm>("createdtime");
             p.dosage = v.get<double>("dosage");
             std::string str_macronutrients = v.get<std::string>("nutrients");
-            log_DEBUG(str_macronutrients);
             json_loads(str_macronutrients,p.nutrients);
+            //log_DEBUG(str_macronutrients);
 
             // p.gender will be set to the default value "unknown"
             // when the column is null:
