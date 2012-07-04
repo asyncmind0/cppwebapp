@@ -1,6 +1,6 @@
 //require(["dijit/form/Button",  "dojo/domReady!"]);
-require(["dojo","dijit/form/ComboBox", "dojo/data/ItemFileReadStore", "dojo/_base/event","dojox/fx","dojo/domReady!"],
-        function(dojo,ComboBox, ItemFileReadStore, event,fx) {
+require(["dojo","dijit","dijit/form/FilteringSelect", "dojo/data/ItemFileReadStore", "dojo/_base/event","dojox/fx","dojo/domReady!"],
+        function(dojo,dijit,FilteringSelect, ItemFileReadStore, event,fx) {
 
             // create store instance
             // referencing data from states.json
@@ -10,9 +10,10 @@ require(["dojo","dijit/form/ComboBox", "dojo/data/ItemFileReadStore", "dojo/_bas
 
             // create Select widget,
             // populating its options from the store
-            var select = new ComboBox({
+            var select = new FilteringSelect({
                 name: "macronutrient_select",
                 store: stateStore,
+                required:false,
             }, "macronutrient_select");
             select.startup();
 
@@ -36,10 +37,18 @@ require(["dojo","dijit/form/ComboBox", "dojo/data/ItemFileReadStore", "dojo/_bas
                 }else{
                     var closebtn = dojo.query(".closebtn")[0];
                     var item = dojo.create('span',{
-                        innerHTML:macronutrient,
                         'class':'nutrient'},
                         "macronutrients_form",'last');
-                    dojo.create('input',{type:"text",name:macronutrient,value:dosage,size:"50"},item,'last');
+                    var myTextBox = new dijit.form.TextBox({
+                            name: macronutrient,
+                            size:"50",
+                            value: dosage /* no or empty value! */,
+                            /*placeHolder: "type in your name"*/
+                        });
+                    dojo.create('label',{innerHTML:macronutrient+": "}, item,'last');
+                    dojo.create("br",{},item,'last');
+                    dojo.place(myTextBox.domNode,item,'last');
+                    //dojo.create('input',{type:"text",name:macronutrient,value:dosage,size:"50"},item,'last');
                     dojo.create('img',{src:closebtn.src,'class':'closebtn'},item,'last');
                     dojo.query(".closebtn",item).on("click", onClose);
                 }

@@ -1,13 +1,21 @@
-<form action="/nutrition/edit/{{ID}}/" method="post">
-  <input type="hidden" name="id" value="{{ID}}"/>
-  Name: <input type="text" name="name" value="{{NAME}}" size="50"/><br />
-  Description:<br>
-  <textarea name="description" rows="5" cols="50">
+<!--http://net.tutsplus.com/tutorials/html-css-techniques/20-html-forms-best-practices-for-beginners/-->
+<!--http://css-tricks.com/label-placement-on-forms/-->
+<form action="/nutrition/edit/{{ID}}/" method="post"
+  data-dojo-type="dijit.form.Form" >
+  <input type="hidden" name="id" value="{{ID}}" />
+  <label>Name:</label><br>
+  <input type="text" name="name" value="{{NAME}}" size="50" data-dojo-type="dijit.form.TextBox"/><br />
+  <label>Description:</label><br>
+  <textarea data-dojo-type="dijit.form.SimpleTextarea" name="description" rows="5" cols="50">
     {{DESCRIPTION}}
   </textarea> <br>
-  Dosage: <input type="text" name="dosage" value="{{DOSAGE}}" size="50"/><br />
-  Dosage Size: <input type="text" name="dosage_size" value="{{DOSAGE_SIZE}}" size="50"/><br />
-  <br>
+  <label>Dosage:</label><br>
+  <input type="text" name="dosage" value="{{DOSAGE}}"
+  size="50" data-dojo-type="dijit.form.TextBox"/><br />
+  <label>Dosage Size:</label><br>
+  <input data-dojo-type="dijit.form.TextBox" type="text"
+         name="dosage_size" value="{{DOSAGE_SIZE}}" size="50"/> <br />
+  <label>Nutrients:</label><br>
   <select data-dojo-type="dijit.form.FilteringSelect" id="macronutrient_select">
     {{#MACRONUTRIENTS_SELECT}}
     <option value="{{NUTRIENT}}" data-dosage="{{DOSAGE}}">{{NUTRIENT}}</option>
@@ -16,17 +24,19 @@
   <button class="form_btn">Add</button>
   <div id="macronutrients_form">
     Add nutrients by selecting the nutrient and clicking on the 'Add'
-    button.
+    button.<br>
     Remove by clicking on the delete button.
     {{#MACRONUTRIENTS}}
-    <span class="nutrient">{{NUTRIENT}}: <input type="text" name="{{NUTRIENT}}"
-    value="{{DOSAGE}}" size="50"/>
+    <span class="nutrient"><label>{{NUTRIENT}}:</label> <br><input type="text" name="{{NUTRIENT}}"
+                                                data-dojo-type="dijit.form.TextBox"
+                                                value="{{DOSAGE}}" size="50"/>
       <img src="{{STATIC_PREFIX}}images/buttons/cross.png" class="closebtn"></img>
     </span>
     {{/MACRONUTRIENTS}}
   </div>
   
-  <input type="submit" value="Submit" />
+  <input type="submit" value="Submit"
+  data-dojo-type="dijit.form.Button" label="Submit" />
 </form>
 
 <a href="/nutrition">back</a>
