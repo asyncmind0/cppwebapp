@@ -103,6 +103,7 @@ int main(int argc, char *argv[])
                 std::regex rx(handler.first);
                 std::smatch result;
                 if(std::regex_match(req.path,result,rx)){
+                    log_DEBUG("Matched:",handler.first);
                     request_args r (req,conn,*pool,result);
                     auto result = std::async(std::launch::async,
                                              *handler.second,std::ref(r));

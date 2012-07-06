@@ -30,6 +30,7 @@ void nurition_handler(request_args &r){
     }
     r.conn.reply_http(r.req,render_template("base.html",dict),200,"OK",default_headers);
 }
+
 void nurition_edit_handler(request_args &r){
     if(r.args.size()<2){
         r.conn.reply_http(r.req,"Error: no supplement id specified",403,"OK",default_headers);
@@ -67,7 +68,8 @@ void nurition_edit_handler(request_args &r){
                     redir_headers.push_back({"Location","/nutrition/edit/"+std::string(uuid_str)+"/" });
                     code = 303;
                 }else{
-                    sql << "update nutrition_supplements set name = :name , description = :description , dosage = :dosage , nutrients = :nutrients where uuid = '" << uuid << "'", soci::use(s);
+                    sql << "update nutrition_supplements set name = :name , description = :description "
+                        <<", dosage = :dosage , nutrients = :nutrients where uuid = '" << uuid << "'", soci::use(s);
                 }
             }
         }catch (std::exception const &e){
@@ -114,8 +116,8 @@ void macronutrients_list_handler(request_args &r){
 }
 
 extern "C" void init_handler(std::unordered_map<std::string, request_handler> &request_handlers_map){
-    request_handlers_map["/nutrition"] = &nurition_handler;
     request_handlers_map["/nutrition/edit/(.+)/"] = &nurition_edit_handler;
+    request_handlers_map["/nutrition/"] = &nurition_handler;
     request_handlers_map["/nutrition/macronutrients"] = &macronutrients_list_handler;
 }
 

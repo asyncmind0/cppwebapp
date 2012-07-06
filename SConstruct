@@ -3,6 +3,10 @@ AddOption('--handlers',
           dest='handlers',
           action='store_true',
           help='rebuild only handlers')
+AddOption('--tests',
+          dest='tests',
+          action='store_true',
+          help='rebuild only tests')
 
 env = Environment(
     CPPPATH = ['lib/mongrel2-cpp/lib',
@@ -65,6 +69,11 @@ if GetOption('handlers'):
                   CC='-fPIC',
                   LIBS=main_libs,
                   LIBPATH=['.'])
+if GetOption('tests'):
+    env.Program('build/regex_tester',
+            ['src/cpp/regex_tester.cpp',],
+            LIBS=main_libs,
+            LIBPATH=['.'])
 else:
     env.Program('build/main',
             ['src/cpp/main.cpp',],

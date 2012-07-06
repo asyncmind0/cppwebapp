@@ -1,0 +1,12 @@
+*.os
+*.o
+.sconsign.dblite
+build/
+var/static/css/
+var/static/javascript/
+var/proc/
+var/log/
+var/run/
+tmp/
+var/mongrel/
+.sass-cache/
