@@ -2,6 +2,7 @@
 #include "models/post.h"
 #include "models/user.h"
 #include "models/supplement.h"
+#include "models/macronutrient.h"
 #include "cache.h"
 
 static const std::string templatepath = "src/html/";
@@ -70,6 +71,7 @@ int main(int argc, char *argv[])
         Post::create_table(sql);
         User::create_table(sql);
         Supplement::create_table(sql);
+        MacroNutrient::create_table(sql);
 
         m2pp::connection conn(sender_id, argv[1], argv[2]);
         log_INFORMATIONAL("== starting server ==");

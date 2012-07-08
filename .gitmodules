@@ -10,3 +10,12 @@
 [submodule "lib/html5-boilerplate"]
 	path = lib/html5-boilerplate
 	url = http://github.com/h5bp/html5-boilerplate
+[submodule "src/javascript/dojo"]
+	path = src/javascript/dojo
+	url = https://github.com/dojo/dojo.git
+[submodule "src/javascript/dijit"]
+	path = src/javascript/dijit
+	url = https://github.com/dojo/dijit.git
+[submodule "src/javascript/dojox"]
+	path = src/javascript/dojox
+	url = https://github.com/dojo/dojox.git

@@ -45,9 +45,12 @@ button, a.btn{
 .form_btn{
     @include fancy-button-structure(14px, 4px, 2px);}
     
+nav a{
+    margin-left:5px;
+    }
 
 #macronutrients_form{
-    border:2px black solid;}
+    border:1px black dotted;}
 
 span.nutrient{
     display:block;

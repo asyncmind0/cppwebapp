@@ -18,6 +18,8 @@
 #include "form.h"
 #include <ctemplate/template.h>
 #include <soci/soci.h>
+#include <boost/lexical_cast.hpp>
+
 
 typedef struct _request_args_ {
     soci::connection_pool &db_pool;
@@ -42,7 +44,17 @@ ctemplate::TemplateDictionary* base_template_variables(ctemplate::TemplateDictio
     dict->SetValue("DESCRIPTION", "Steven's first site written using c++11.");
     dict->SetValue("FOOTER", "Aren't these great results?");
     dict->SetGlobalValue("STATIC_PREFIX", "/static/");
+    dict->SetGlobalValue("DOJOTEXTBOX", "data-dojo-type=\"dijit.form.TextBox\"");
+    dict->SetGlobalValue("DOJOSIMPLETEXTAREA", "data-dojo-type=\"dijit.form.SimpleTextarea\"");
+    dict->SetGlobalValue("DOJOBUTTON", "data-dojo-type=\"dijit.form.Button\"");
     return dict;
+}
+
+void include_scripts(ctemplate::TemplateDictionary* dict,std::list<std::string> scripts){
+    for(auto it:scripts){
+        ctemplate::TemplateDictionary* script_dict = dict->AddSectionDictionary("SCRIPTS");
+        script_dict->SetValue("SCRIPT", "'"+it+"',");
+    }
 }
 
 

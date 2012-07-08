@@ -1,10 +1,14 @@
-<h2>Experimantal web app using C++11 features, in a python djangoish way.</h2>
-
+<h2>Experimental web app using C++11 features.</h2>
 <p>
-<ol>
-  {{#POSTS}}
-  <li id="{{ID}}"><h3>{{TITLE}}</h3> <a href="/editpost/{{ID}}/">edit</a> <a href="javascript:deletepost('{{ID}}')">delete</a></li>
-  {{/POSTS}}
-</ol>
-<a href="/editpost/-1/">new post</a>
+  <ol>
+    {{#POSTS}}
+    <li id="{{ID}}">
+      <h3>{{TITLE}}</h3>
+      <a href="/editpost/{{ID}}/">edit</a>
+      <a class='deletepost'
+         href="/deletepost/{{ID}}/">delete</a>
+    </li>
+    {{/POSTS}}
+  </ol>
+  <a href="/editpost/-1/">new post</a>
 </p>

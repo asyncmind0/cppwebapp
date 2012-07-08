@@ -70,6 +70,17 @@ Supplement(std::string name, std::string description, uuid_t u,std::tm created_d
         }
         return 0;
     }
+    static int update(soci::session &sql, Supplement& s ){
+        try{
+            sql << "update nutrition_supplements set name = :name , description = :description "
+                <<", dosage = :dosage , nutrients = :nutrients where uuid = :uuid", soci::use(s);
+        }catch (std::exception const &e){
+            std::cerr << "Error: " << e.what() << '\n';
+        }catch(...){
+            log_ERROR("db error");
+        }
+        return 0;
+    }
     /*static void cache_set(Post &post)
     {
         std::vector<char> raw_product(sizeof(Post));

@@ -1,0 +1,14 @@
+<p>
+<ol>
+  {{#MACRONUTRIENTS}}
+  <li id="{{ID}}"><h3>{{NAME}}:{{DRV}}g</h3>
+    <a href="/nutrition/macronutrient/edit/{{ID}}/">edit</a>
+    <a href="javascript:deletepost('{{ID}}')">delete</a>
+  </li>
+  {{/MACRONUTRIENTS}}
+</ol>
+</p>
+<nav>
+<a href="/nutrition/macronutrient/edit/-1/">New Macronutrient</a>
+<a href="/nutrition/">Back</a>
+</nav>

@@ -1,10 +1,14 @@
 <form action="/editpost/{{ID}}/" method="post">
   <input type="hidden" name="id" value="{{ID}}"/>
-    Title: <input type="text" name="title" value="{{TITLE}}" size="100"/><br />
-    <textarea name="body" rows="20" cols="100">
-      {{BODY}}
-      </textarea> 
-    <input type="submit" value="Submit" />
+  <label>Title:</label>
+  <br>
+  <input type="text" name="title" value="{{TITLE}}"
+          style="width:100%"      {{DOJOTEXTBOX}} />
+  <br />
+  <textarea name="body" rows="20"  {{DOJOSIMPLETEXTAREA}}>
+    {{BODY}}
+  </textarea> 
+  <input type="submit" value="Submit" {{DOJOBUTTON}} label="Submit" />
+<a href="/">back</a>
 </form>
 
-<a href="/">back</a>
