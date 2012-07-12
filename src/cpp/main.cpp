@@ -7,7 +7,7 @@
 
 static const std::string templatepath = "src/html/";
 static std::unordered_map<std::string,void*> handler_lib_map;
-static std::list<std::string> handler_libs = {"libhandlers.so","libnutrition.so"};
+static std::list<std::string> handler_libs = {"libhandlers.so","libnutrition.so","libdataloader.so"};
 
 int reload_handler(std::list<std::string> handlerlibs,std::unordered_map<std::string, request_handler> &request_handlers){
     //http://stackoverflow.com/questions/496664/c-dynamic-shared-library-on-linux
@@ -60,10 +60,15 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        soci::connection_pool *pool = init_soci();
+        soci::connection_pool *pool = init_soci("postgresql://dbname=cppblog");
+        soci::connection_pool *pool_sqlite = init_soci("sqlite3://dbname=cppblog");
         log_INFORMATIONAL("== starting db connection pool ==");
         if(pool == nullptr){
             log_CRITICAL("== starting db connection pool failed ==");
+            return 1;
+        }
+        if(pool_sqlite == nullptr){
+            log_CRITICAL("== starting sqlite_db connection pool failed ==");
             return 1;
         }
 

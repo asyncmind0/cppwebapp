@@ -9,20 +9,22 @@
 #include <list>
 #include  <uuid/uuid.h>
 #include "utils.h"
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 const size_t poolSize = 10;
-static bool soci_pool_initialized = 0;
 
 
-soci::connection_pool* init_soci(){
-    if(soci_pool_initialized==1)return 0 ;
+soci::connection_pool* init_soci(std::string connstr){
+    /*if(boost::starts_with(connstr, "sqlite://")){
+        connstr = boost::algorithm::ireplace_first_copy(connstr,"sqlite://","");
+        }A*/
     soci::connection_pool *pool = new soci::connection_pool(poolSize);
     for (size_t i = 0; i != poolSize; ++i)
     {
         soci::session & sql = pool->at(i);
-        sql.open("postgresql://dbname=cppblog");
+        sql.open(connstr);
     }
-    soci_pool_initialized=1;
     return pool;
 }
 

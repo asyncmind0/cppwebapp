@@ -1,5 +1,6 @@
 require 'ninesixty'
 require 'fancy-buttons'
+require 'susy'
 # Require any additional compass plugins here.
 
 

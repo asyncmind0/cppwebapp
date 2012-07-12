@@ -19,3 +19,6 @@
 [submodule "src/javascript/dojox"]
 	path = src/javascript/dojox
 	url = https://github.com/dojo/dojox.git
+[submodule "lib/csv_iterator"]
+	path = lib/csv_iterator
+	url = https://github.com/tonicebrian/csv_iterator.git

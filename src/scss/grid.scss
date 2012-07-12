@@ -4,8 +4,48 @@
  * Licensed under GPL and MIT. */
 
 @import "compass/reset";
-@import "960/grid";
+//@import "960/grid";
+@import "susy";
+$total-columns  : 12;             // a 12-column grid
+$column-width   : 4em;            // each column is 4em wide
+$gutter-width   : 1em;            // 1em gutters between columns
+$grid-padding   : $gutter-width;  // grid-padding equal to gutters
 
+//$total-columns: 4;
+
+.page {
+    // page acts as a container for our grid.
+    @include container;
+
+    // header and footer are full-width by default.
+    header, footer { clear: both; }
+
+    // nav spans 3 columns of total 12.
+    nav { @include span-columns(3,12); }
+
+    .content {
+        // content spans the final (omega) 9 columns of 12.
+        @include span-columns(9 alpha,12);
+
+        // main content spans 6 of those 9 columns.
+        .main { @include span-columns(6,9); }
+
+        // secondary content spans the final 3 (omega) of 9 columns.
+        #sidebar{ @include span-columns(3 omega,12);}
+        .secondary { @include span-columns(3 omega,9); }
+    }
+    footer{
+        text-align:center;
+    }
+
+    // Create a media-query breakpoint at a min-width of 30em
+    // And use a larger 8-column grid within that media-query.
+    @include at-breakpoint(30em 8) {
+        // Establish our new 8-column container.
+        @include container;
+    }
+}
+/*
 // The following generates the default grids provided by the css version of 960.gs
 .container_12 {
   @include grid-system(12); }
@@ -25,3 +65,4 @@ $ninesixty-columns: 24;
     @include grid(8); }
   #main-content {
     @include grid(16); } }
+    */

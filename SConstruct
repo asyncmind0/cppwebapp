@@ -13,6 +13,7 @@ env = Environment(
                'lib/',
                'lib/httplib/include',
                'lib/httplib/',
+               'lib/csv_iterator/include',
                '/usr/include/stlsoft/include',
                '/usr/include/pantheios/include',
                '/usr/include/soci/',
@@ -66,6 +67,11 @@ if GetOption('handlers'):
                   LIBPATH=['.'])
     env.SharedLibrary('build/lib/libnutrition.so',
                   ['src/cpp/handlers/nutrition.cpp'],
+                  CC='-fPIC',
+                  LIBS=main_libs,
+                  LIBPATH=['.'])
+    env.SharedLibrary('build/lib/libdataloader.so',
+                  ['src/cpp/handlers/dataloader.cpp'],
                   CC='-fPIC',
                   LIBS=main_libs,
                   LIBPATH=['.'])
