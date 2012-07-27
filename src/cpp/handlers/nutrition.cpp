@@ -24,10 +24,8 @@ static std::list<std::string> scripts = {"app/nutrition"};
 */
 
 void nurition_handler(request_args &r){
-    ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("base"));
-    include_scripts(dict,scripts);
-    ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("CONTENT");
-    content_dict->SetFilename("nutrition.html");
+    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
+    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"nutrition.html");
     std::list<Supplement> supplements;
     soci::session sql(r.db_pool);
     Supplement::get_all(sql,supplements);
@@ -38,6 +36,7 @@ void nurition_handler(request_args &r){
         uuid_unparse(it.uuid,uuid_str);
         post_dict->SetValue("ID", uuid_str);
     }
+    content_dict->ShowSection("SUPPLEMENTS");
     r.conn.reply_http(r.req,render_template("base.html",dict),200,"OK",default_headers);
 }
 
@@ -89,10 +88,8 @@ void nurition_edit_handler(request_args &r){
             log_ERROR("unknown db error");
         }
     }
-    ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("base"));
-    include_scripts(dict,scripts);
-    ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("CONTENT");
-    content_dict->SetFilename("nutrition_edit.html");
+    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
+    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"nutrition_edit.html",scripts);
     for(auto nutrient : s.nutrients){
         ctemplate::TemplateDictionary *macronutrients_dict = content_dict->AddSectionDictionary("MACRONUTRIENTS");
         macronutrients_dict->ShowSection("MACRONUTRIENTS");
@@ -136,10 +133,8 @@ void macronutrients_list_handler(request_args &r){
 }
 
 void macronutrient_handler(request_args &r){
-    ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("base"));
-    include_scripts(dict,scripts);
-    ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("CONTENT");
-    content_dict->SetFilename("macronutrients.html");
+    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
+    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"macronutrients.html",scripts);
     std::list<MacroNutrient> macronutrients;
     soci::session sql(r.db_pool);
     MacroNutrient::get_all(sql,macronutrients);
@@ -193,10 +188,8 @@ void macronutrient_edit_handler(request_args &r){
             log_ERROR("unknown db error");
         }
     }
-    ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("base"));
-    include_scripts(dict,scripts);
-    ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("CONTENT");
-    content_dict->SetFilename("macronutrient_edit.html");
+    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
+    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"macronutrient_edit.html",scripts);
     content_dict->SetValue("NAME",s.name);
     content_dict->SetValue("DESCRIPTION",s.description);
     content_dict->SetValue("ID", uuid);

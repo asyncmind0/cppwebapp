@@ -1,0 +1,25 @@
+<header>
+  <h1> {{TITLE}} </h1>
+</header>
+<nav>
+  <a href="/">Home</a>
+  <a href="/nutrition/">Nutrition</a>
+</nav>
+<div class="content">
+  <aside class="secondary" id="sidebar" style="display:none">
+    <div id="profile">
+      <img src="{{STATIC_PREFIX}}images/jagguli.png" />
+    </div>
+    <form id="loginform" action="/login" method="post">
+      <label for="userid" >Userid:</label><br>
+      <input type="text"  name="userid" /><br />
+      <label for="password"> Password:</label><br>
+      <input type="password" name="password" /><br />
+      <a class="btn login" onclick="$('#loginform').submit();">Login</a>
+      <a class="btn register" href="/register" >Register</a>
+    </form>
+  </aside>
+  <section class="main" style="display:none">
+    {{>CONTENT}}
+  </section>
+</div>

@@ -58,23 +58,15 @@ main_libs = ['m2pp','zmq','json',
                   ]
 arch = platform.architecture()[0]
 main_libs.extend([plib+".file64bit" if arch == "64bit" else plib for plib in pantheios_libs])
-
+handlers = ["handlers","nutrition","dataloader","home", "auth"]
 if GetOption('handlers'):
-    env.SharedLibrary('build/lib/libhandlers.so',
-                  ['src/cpp/handlers/handlers.cpp'],
+    for handler in handlers:
+        env.SharedLibrary('build/lib/lib%s.so'%handler,
+                  ['src/cpp/handlers/%s.cpp'%handler],
                   CC='-fPIC',
                   LIBS=main_libs,
                   LIBPATH=['.'])
-    env.SharedLibrary('build/lib/libnutrition.so',
-                  ['src/cpp/handlers/nutrition.cpp'],
-                  CC='-fPIC',
-                  LIBS=main_libs,
-                  LIBPATH=['.'])
-    env.SharedLibrary('build/lib/libdataloader.so',
-                  ['src/cpp/handlers/dataloader.cpp'],
-                  CC='-fPIC',
-                  LIBS=main_libs,
-                  LIBPATH=['.'])
+
 if GetOption('tests'):
     env.Program('build/regex_tester',
             ['src/cpp/regex_tester.cpp',],

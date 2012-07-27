@@ -18,14 +18,11 @@ void loaddata_handler(request_args &r){
     csv::iterator<record> it(in);
     std::ostringstream response;
     // Use the iterator in your algorithms.
-    for(auto rec:it){
-            log_DEBUG("ok");
-    }
-/*std::for_each(it, csv::iterator<record>(), [](record rec){
+    std::for_each(it, csv::iterator<record>(), [](record rec){
             log_DEBUG("ok");
             //response << "ok";
             //response << rec.get<0>();
-            });*/
+            });
     r.conn.reply_http(r.req, response.str());
     /*}catch(...){
         log_DEBUG("Error loading data");

@@ -2,13 +2,12 @@
 @import "compass/reset";
 @import "compass/typography";
 @import "blueprint/form";
-@import "960/grid";
+//@import "960/grid";
 @import "fancy-buttons";
 //@import "compass/utilities/sprites/sprite-img";
 @import "compass/css3/images";
 
 @include global-reset;
-
 $base-font-size: 16px;
 $base-line-height: 24px;
 @include establish-baseline;
@@ -36,11 +35,6 @@ button, a.btn{
     margin-right:3px;
     @include fancy-button-colors-matte(#124c89, adjust-hue(#124c89, -120), darken(adjust-hue(#124c89, -120), 6));}
 
-.login{
-    @include fancy-button-structure(16px, 4px, 2px);}
-
-.register{
-    @include fancy-button-structure(14px, 4px, 2px);}
 
 .form_btn{
     @include fancy-button-structure(14px, 4px, 2px);}
@@ -66,3 +60,5 @@ label{
  //   @include background(image-url("buttons/cross.png"));}
 
     //@include sprite-img("buttons/cross.png", 1)}
+
+

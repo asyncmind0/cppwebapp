@@ -3,6 +3,7 @@
 #include <string>
 #include <json/json.h>
 #include <iomanip>
+#include  <uuid/uuid.h>
 #include "logging.h"
 std::string toDoubleStr(double &x){
     std::ostringstream ss;
@@ -64,5 +65,12 @@ std::string json_dumps(const std::unordered_map<std::string,T> &obj){
     std::ostringstream s;
     s << json_object_to_json_string(my_object);
     return s.str();
+}
+
+std::shared_ptr<std::string> uuidToStr(uuid_t &uuid){
+    char uuid_str[37];
+    uuid_unparse(uuid,uuid_str);
+    std::shared_ptr<std::string> ptr(new std::string(uuid_str));
+    return ptr;
 }
 #endif

@@ -21,8 +21,8 @@ $ninesixty-columns: 24;
 @include sticky-footer(92px, "#wrapper", "#bump", "footer");
 */
 $total-columns  : 24;             // a 12-column grid
-$column-width   : 4em;            // each column is 4em wide
-$gutter-width   : 1em;            // 1em gutters between columns
+$column-width   : 6em;            // each column is 4em wide
+$gutter-width   : 2em;            // 1em gutters between columns
 $grid-padding   : $gutter-width;  // grid-padding equal to gutters
 $container-style: magic;
 
@@ -31,7 +31,7 @@ $container-style: magic;
 .page {
     // page acts as a container for our grid.
     @include container;
-    @include susy-grid-background;
+    //@include susy-grid-background;
 
     // header and footer are full-width by default.
     header, footer { clear: both; }
@@ -50,9 +50,6 @@ $container-style: magic;
         #sidebar{ @include span-columns(6 omega,24);}
         .secondary { @include span-columns(3 omega,9); }
     }
-    footer{
-        text-align:center;
-    }
 
     // Create a media-query breakpoint at a min-width of 30em
     // And use a larger 8-column grid within that media-query.
@@ -61,10 +58,10 @@ $container-style: magic;
         @include container;
     }
 }
-@include sticky-footer(92px, "#page", "#bump", "footer");
-/*html, body{
-    height:100%;
-    }*/
-footer{
-    text-align:center;
-    }
+@include sticky-footer(92px, ".page", "#bump", "#footer");
+#footer{
+    text-align:right;
+    font-size:10px !important;
+    padding-right:20px !important;
+    background: #cccccc;
+}

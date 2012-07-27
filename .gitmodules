@@ -22,3 +22,6 @@
 [submodule "lib/csv_iterator"]
 	path = lib/csv_iterator
 	url = https://github.com/tonicebrian/csv_iterator.git
+[submodule "src/javascript/util"]
+	path = src/javascript/util
+	url = https://github.com/dojo/util.git

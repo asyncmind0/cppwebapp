@@ -65,7 +65,7 @@ define([ 'dojo/has', 'require' ], function (has, require) {
                     dojo.query('.deletepost').on('click',deletepost);
                     parser.parse();
                     dojo.style(dojo.query('.main')[0],'display','');
-                    dojo.style('sidebar','display','');
+                    //dojo.style('sidebar','display','');
                 });
     }
     else {

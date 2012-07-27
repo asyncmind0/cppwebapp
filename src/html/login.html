@@ -1,0 +1,10 @@
+{{#LOGIN_FORM}}
+<form action="/login" method="post">
+    User name: <input type="text" name="userid" /><br />
+    Password: <input type="password" name="pwd" /><br />
+    <input type="submit" value="Submit" />
+</form>
+{{/LOGIN_FORM}}
+{{#MESSAGE}}
+<b> Login: {{STATUS}}</b>
+{{/MESSAGE}}

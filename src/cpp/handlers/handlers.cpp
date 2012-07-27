@@ -5,11 +5,11 @@
 #include "../models/user.h"
 #include  <uuid/uuid.h>
 
+static std::list<std::string> scripts = {};
 
 void index_handler(request_args &r){
-    ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("base"));
-    ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("CONTENT");
-    content_dict->SetFilename("index.html");
+    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
+    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"index.html",scripts);
     content_dict->SetValue("FIRST_NAME","Steven");
     content_dict->SetValue("LAST_NAME","Joseph");
     std::list<Post> posts;
@@ -22,7 +22,7 @@ void index_handler(request_args &r){
         uuid_unparse(it.uuid,uuid_str);
         post_dict->SetValue("ID", uuid_str);
     }
-    r.conn.reply_http(r.req,render_template("base.html",dict),200,"OK",default_headers);
+    r.conn.reply_http(r.req,render_template("base.html",content_dict),200,"OK",default_headers);
 }
 
 void edit_handler(request_args &r){
@@ -32,8 +32,8 @@ void edit_handler(request_args &r){
     }
     std::vector<m2pp::header> redir_headers = {{"Content-Type","text/html"}};
     int code = 200;
-    ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("base"));
-    ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("CONTENT");
+    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
+    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"edit.html",scripts);
     Post *post  = new Post("","");
     soci::session sql(r.db_pool);
     std::string uuid;
@@ -50,9 +50,7 @@ void edit_handler(request_args &r){
                 if(!sql.got_data()){
                     log_DEBUG("Creating ID:",uuid);
                     Post::create(sql,*post);
-                    char uuid_str[37];
-                    uuid_unparse(post->uuid,uuid_str);
-                    redir_headers.push_back({"Location","/editpost/"+std::string(uuid_str)+"/" });
+                    redir_headers.push_back({"Location","/editpost/"+*uuidToStr(post->uuid)+"/" });
                     code = 303;
                 }else{
                     sql << "update blog_posts set title = :title , body = :body where uuid = '" << uuid << "'", soci::use(*post);
@@ -64,7 +62,6 @@ void edit_handler(request_args &r){
             log_ERROR("unknown db error");
         }
     }
-    content_dict->SetFilename("edit.html");
     content_dict->SetValue("TITLE",post->title);
     content_dict->SetValue("BODY",post->body);
     content_dict->SetValue("ID", uuid);
@@ -94,45 +91,7 @@ void delete_handler(request_args &r){
     std::unordered_map<std::string,std::string> resp({{"id",uuid}});
     render_json(r,resp);
 }
-void register_handler(request_args &r){
-    ctemplate::TemplateDictionary* dict = base_template_variables(new ctemplate::TemplateDictionary("register"));
-    ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("CONTENT");
-    content_dict->SetFilename("register.html");
-    if(header_value(r.req.headers,"METHOD") == "POST"){
-        std::unordered_map<std::string,std::string> registration_form = getFormFields(r.req.body);
-        for(auto fields:registration_form){
-            std::cout << fields.first << " = " << fields.second << std::endl;
-        }
-        time_t now = time(NULL);
-        std::tm *timeinfo = localtime(&now);
-        User u(registration_form["userid"],
-             registration_form["firstname"],
-             registration_form["lastname"],
-             registration_form["password"],
-             *timeinfo);
-        soci::session sql(r.db_pool);
-        int status = User::create(sql,u);
-        if(status==1){
-            dict->SetValueAndShowSection("REGISTER_STATUS", "success", "REGISTER_MESSAGE");
-        }else if(status==2){
-            dict->SetValueAndShowSection("REGISTER_STATUS", "User id already exists.", "REGISTER_MESSAGE");
-            dict->ShowSection("REGISTER_FORM");
-        }else{
-            dict->SetValueAndShowSection("REGISTER_STATUS", "fail", "REGISTER_MESSAGE");
-            dict->ShowSection("REGISTER_FORM");
-        }
-    }else{
-        dict->ShowSection("REGISTER_FORM");
-    }
-    r.conn.reply_http(r.req,render_template("register.html",dict),200,"OK",default_headers);
-}
 
-void login_handler(request_args &r){
-    for(auto fields:getFormFields(r.req.body)){
-        std::cout << fields.first << " = " << fields.second << std::endl;
-    }
-    r.conn.reply_http(r.req, "loggin done");
-}
 
 void dbtest_handler(request_args &r){
     time_t now = time(NULL);
@@ -149,10 +108,8 @@ void dbtest_handler(request_args &r){
 
 
 extern "C" void init_handler(std::unordered_map<std::string, request_handler> &request_handlers_map){
-    request_handlers_map["/"] = &index_handler;
+    request_handlers_map["/blog"] = &index_handler;
     request_handlers_map["/dbtest"] = &dbtest_handler;
-    request_handlers_map["/login"] = &login_handler;
-    request_handlers_map["/register"] = &register_handler;
     request_handlers_map["/editpost/(.+)/"] = &edit_handler;
     request_handlers_map["/deletepost/(.+)/"] = &delete_handler;
 }

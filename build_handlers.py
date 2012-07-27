@@ -18,7 +18,7 @@ def compile_scss(event):
 
 def compile_handlers(event):
     if os.system('scons -j3 --handlers') == 0:
-        print os.system('wget http://localhost:9090/reload_libs -q --timeout 1  --tries 1 -O-')
+        print os.system('wget http://localhost/reload_libs -q --timeout 1  --tries 1 -O-')
     return 0
     
 

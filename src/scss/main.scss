@@ -1,0 +1,85 @@
+$default-text-shadow-color: rgba(red, 0.6);
+$default-text-shadow-blur: 3px;
+$default-text-shadow-v-offset: 1px;
+@import "compass/css3/border-radius";
+@import "compass/css3/box-shadow";
+@import "compass/css3";
+@import "fancy-buttons";
+@import "susy";
+.page{
+        min-width:992px;
+        margin-top:0px;
+        padding-top:1px;
+}
+#home{
+    //width:65%;
+    height: 450px;
+    margin-top:100px;
+    @include border-radius(5px);
+    @include single-box-shadow; 
+    padding:0px 0px 0px 40px;
+    #heading{
+        position:relative;
+        top:00px;
+        height:10px;
+        width:645px;
+        display:block;
+        //vertical-align:middle;
+        b{
+        font-size:44pt;
+        }
+        font-family:PFDinDisplayPro, sans-serif;
+        font-weight: 500;
+        padding:80px  0px  25px 0px;
+        @include single-text-shadow; 
+        //border:1px solid;
+    }
+    #subheader{
+        //display:inline;
+        float:right;
+        border-left:2px solid;
+        //border:1px solid;
+        border-left:1px solid;
+        margin-top:-1em;
+        text-align:right;
+        padding:0.5em 0px 1.5em .5em;
+        }
+    .details{
+        padding:25px  15px  25px 10px;
+    }
+    #buttons{
+        margin-top:20px;
+    }
+    .actionmessage{
+        @include inline-block();
+        margin-right:45px;
+        @include span-columns(5 alpha,24);
+        p{
+            display:block;
+            border-left:1px solid;
+            padding: 0px 0px 0px 0.5em;
+            font-size:12px;
+            @include span-columns(6 alpha,6);
+            }
+        }
+.button, a.btn{
+    @include fb-reset;
+    margin-right:3px;
+    text-align:center;
+    @include fancy-button-colors-matte(#124c89, adjust-hue(#124c89, -120), darken(adjust-hue(#124c89, -120), 6));}
+
+#login{
+@include span-columns(4 alpha,6);
+//height:30px;
+//vertical-align:middle;
+    @include fancy-button-structure(16pt, 6px, 1px);}
+
+#register{
+    //@include pre(3);
+@include span-columns(4 alpha,6);
+    @include fancy-button-structure(16pt, 6px, 1px);}
+    
+}
+#footer{
+    display:none;
+    }

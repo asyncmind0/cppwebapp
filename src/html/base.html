@@ -21,8 +21,9 @@
     
     <link rel="stylesheet" href="{{STATIC_PREFIX}}css/screen.css">
     <link rel="stylesheet" href="{{STATIC_PREFIX}}css/style.css">
+    <link rel="stylesheet" href="{{STATIC_PREFIX}}css/main.css">
     <link rel="stylesheet" href="{{STATIC_PREFIX}}css/buttons.css" media="screen, projection" type="text/css" />
-    <link rel="stylesheet" href="{{STATIC_PREFIX}}javascript/vendor/dojo/dijit/themes/claro/claro.css" type="text/css">
+    <link rel="stylesheet" href="{{STATIC_PREFIX}}javascript/dijit/themes/claro/claro.css" type="text/css">
     <!--<link rel="stylesheet" href="{{STATIC_PREFIX}}css/ui-lightness/jquery-ui-1.8.21.custom.css" media="screen, projection" type="text/css" />
     <link rel="stylesheet" href="{{STATIC_PREFIX}}css/combobox.css">-->
 
@@ -45,36 +46,12 @@
     
     <!-- Add your site or application content here -->
     <section class="page">
-      <header>
-        <h1> {{TITLE}} </h1>
-      </header>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/nutrition/">Nutrition</a>
-      </nav>
-      <div class="content">
-        <aside class="secondary" id="sidebar" style="display:none">
-          <div id="profile">
-            <img src="{{STATIC_PREFIX}}images/jagguli.png" />
-          </div>
-          <form id="loginform" action="/login" method="post">
-            <label for="userid" >Userid:</label><br>
-            <input type="text"  name="userid" /><br />
-            <label for="password"> Password:</label><br>
-            <input type="password" name="password" /><br />
-            <a class="btn login" onclick="$('#loginform').submit();">Login</a>
-            <a class="btn register" href="/register" >Register</a>
-          </form>
-        </aside>
-        <section class="main" style="display:none">
-          {{>CONTENT}}
-        </section>
-      </div>
-      <div id="bump"></div>
+      {{>MAINCONTENT}}
+    <div id="bump"></div>
     </section>
-    <footer>
+    <div id="footer">
       {{FOOTER}}
-    </footer>
+    </div>
     <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
     
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
