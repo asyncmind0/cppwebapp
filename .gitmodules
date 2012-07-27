@@ -25,3 +25,6 @@
 [submodule "src/javascript/util"]
 	path = src/javascript/util
 	url = https://github.com/dojo/util.git
+[submodule "lib/plustache"]
+	path = lib/plustache
+	url = git@github.com:jagguli/plustache.git

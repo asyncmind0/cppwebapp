@@ -14,9 +14,11 @@ env = Environment(
                'lib/httplib/include',
                'lib/httplib/',
                'lib/csv_iterator/include',
+               'lib/plustache/include',
                '/usr/include/stlsoft/include',
                '/usr/include/pantheios/include',
                '/usr/include/soci/',
+               'lib/plustache/'
                ],
     CCFLAGS=["-std=gnu++0x",
              "-g", "-O0","-fPIC",
@@ -27,13 +29,17 @@ env = Environment(
 env.SharedLibrary('build/lib/libhttplib.so',
                   ['lib/httplib/src/httplib.cpp'])
 
+env.SharedLibrary('build/lib/libplustache.so',
+                  [
+        'lib/plustache/src/template.cpp',
+        'lib/plustache/src/context.cpp'
+        ])
 #env.SharedLibrary('build/lib/libMPFDParser.so',
 #                  [
 #        'lib/MPFDParser-0.1.1/Parser.cpp',
 #        'lib/MPFDParser-0.1.1/Field.cpp',
 #        'lib/MPFDParser-0.1.1/Exception.cpp',
 #                   ])
-
 
 
 
@@ -46,16 +52,18 @@ pantheios_libs = [
                   ]
 
 main_libs = ['m2pp','zmq','json',
-                  'pthread','m','rt','pq',
-                  'httplib','boost_system', 'boost_regex',
-                  'curl',
-                  'soci_core',
-                  'soci_postgresql',
-                  #'MPFDParser', 
-                  'ctemplate',
-                  'dl',
+             'pthread','m','rt','pq',
+             'httplib',
+             'plustache',
+             'boost_system',
+             'boost_regex',
+             'curl',
+             'soci_core',
+             'soci_postgresql',
+             #'MPFDParser', 
+             'dl',
              'uuid'
-                  ]
+             ]
 arch = platform.architecture()[0]
 main_libs.extend([plib+".file64bit" if arch == "64bit" else plib for plib in pantheios_libs])
 handlers = ["handlers","nutrition","dataloader","home", "auth"]
@@ -81,6 +89,7 @@ else:
 Repository(['build/lib/',
             'lib/mongrel2-cpp/',
             'lib/httplib',
+            'lib/plustache',
             '/usr/lib/pantheios',
             ])
 

@@ -8,7 +8,7 @@
 static std::list<std::string> scripts = {};
 
 void index_handler(request_args &r){
-    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
+    mustache::Context* dict =new mustache::Context();
     ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"index.html",scripts);
     content_dict->SetValue("FIRST_NAME","Steven");
     content_dict->SetValue("LAST_NAME","Joseph");

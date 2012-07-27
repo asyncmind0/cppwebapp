@@ -16,7 +16,9 @@
 #include <map>
 #include <list>
 #include "form.h"
-#include <ctemplate/template.h>
+#include <template.hpp>
+#include <context.hpp>
+#include <plustache_types.hpp>
 #include <soci/soci.h>
 #include <boost/lexical_cast.hpp>
 
@@ -35,43 +37,30 @@ typedef void (*request_handler)(request_args &req_args);
 typedef int (*handler_initializer)(std::unordered_map<std::string, request_handler> &request_handlers_map);
 static std::vector<m2pp::header> default_headers = {{"Content-Type","text/html"},};
 
-void include_scripts(ctemplate::TemplateDictionary* dict,const std::list<std::string> &scripts){
-        for(auto it:scripts){
-            ctemplate::TemplateDictionary* script_dict = dict->AddSectionDictionary("SCRIPTS");
-            script_dict->SetValue("SCRIPT", "'"+it+"',");
-        }
+void include_scripts(mustache::Context *dict,const std::list<std::string> &scripts){
+    mustache::PlustacheTypes::CollectionType c;
+    for(auto it:scripts){
+        mustache::PlustacheTypes::ObjectType script;
+        c.push_back(script);
+    }
+    dict->add("scripts",c);
 }
-ctemplate::TemplateDictionary* base_template_variables(ctemplate::TemplateDictionary *dict,const std::list<std::string> &scripts = {}){
-    ctemplate::Template::SetTemplateRootDirectory("src/html");
-    dict->SetGlobalValue("TITLE", "Nutrient Log - Optimize your nutrition.");
-    dict->SetGlobalValue("DESCRIPTION", "Nutrient Log - Optimize your nutrition.");
-    dict->SetGlobalValue("FOOTER", "Aren't these great results?");
-    dict->SetGlobalValue("STATIC_PREFIX", "/static/");
-    dict->SetGlobalValue("DOJOTEXTBOX", "data-dojo-type=\"dijit.form.TextBox\"");
-    dict->SetGlobalValue("DOJOSIMPLETEXTAREA", "data-dojo-type=\"dijit.form.SimpleTextarea\"");
-    dict->SetGlobalValue("DOJOBUTTON", "data-dojo-type=\"dijit.form.Button\"");
+mustache::Context* base_template_variables(mustache::Context *dict,const std::list<std::string> &scripts = {}){
+    dict->add("TITLE",  "Nutrient Log - Optimize your nutrition.");
+    dict->add("DESCRIPTION", "Nutrient Log - Optimize your nutrition.");
+    dict->add("FOOTER", "Aren't these great results?");
+    dict->add("STATIC_PREFIX",  "/static/");
+    dict->add("DOJOTEXTBOX",  "data-dojo-type=\"dijit.form.TextBox\"" );
+    dict->add("DOJOSIMPLETEXTAREA", "data-dojo-type=\"dijit.form.SimpleTextarea\"");
+    dict->add("DOJOBUTTON", "data-dojo-type=\"dijit.form.Button\"" );
     include_scripts(dict,scripts);
     return dict;
 }
-ctemplate::TemplateDictionary* get_maincontent_dict(ctemplate::TemplateDictionary *dict){
-    ctemplate::TemplateDictionary *main_content_dict = dict->AddIncludeDictionary("MAINCONTENT");
-    main_content_dict->SetFilename("home.html");
-    return main_content_dict;
-}
 
-ctemplate::TemplateDictionary* get_content_dict(ctemplate::TemplateDictionary *dict, std::string templatename,const std::list<std::string> &scripts = {}){
-    ctemplate::TemplateDictionary *base_dict = base_template_variables(dict,scripts);
-    ctemplate::TemplateDictionary *main_content_dict = get_maincontent_dict(base_dict);
-    ctemplate::TemplateDictionary *content_dict = main_content_dict->AddIncludeDictionary("CONTENT");
-    content_dict->SetFilename(templatename);
-    return content_dict;
-}
-
-std::string render_template(const std::string templatefile, ctemplate::TemplateDictionary* dict){
-    std::string output;
-    bool error_free = ctemplate::ExpandTemplate(templatefile, ctemplate::STRIP_WHITESPACE, dict, &output);
-    //log_DEBUG("Template rendered:",templatefile,":",pantheios::boolean(error_free));
-    return output;
+std::string render_template(const std::string templatefile, mustache::Context* dict){
+    std::string template_path("src/html/");
+    mustache::template_t t(template_path);
+    return t.render(templatefile,*dict);
 }
 
 const std::string header_value(std::vector<m2pp::header> headers, std::string key){
