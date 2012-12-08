@@ -1,0 +1,15 @@
+{{> header}}
+<a href="/nutrition/macronutrient/">Edit Macronutrients</a>
+<p>
+<ol>
+  {{#SUPPLEMENTS}}
+  <li id="{{ID}}"><h3>{{NAME}}</h3> <a href="/nutrition/edit/{{ID}}/">edit</a> <a href="javascript:deletepost('{{ID}}')">delete</a></li>
+  {{/SUPPLEMENTS}}
+</ol>
+</p>
+
+<nav>
+<a href="/nutrition/edit/-1/">new supplement</a>
+<a href="/">back</a>
+</nav>
+{{> footer}}

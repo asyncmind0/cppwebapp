@@ -1,0 +1,48 @@
+{{> header}}
+<!--http://net.tutsplus.com/tutorials/html-css-techniques/20-html-forms-best-practices-for-beginners/-->
+<!--http://css-tricks.com/label-placement-on-forms/-->
+<script>
+  var drv_map = {
+  {{#DRVMAP}}
+  "{{NUTRIENT}}":"{{DRV}}",
+  {{/DRVMAP}}
+  };
+  var nutrient_map = [
+  {{#MACRONUTRIENTS}}
+  ["{{NUTRIENT}}", "{{DOSAGE}}"],
+  {{/MACRONUTRIENTS}}
+  ];
+</script>
+<form id="supplement_form" action="/nutrition/edit/{{ID}}/"
+      data-dojo-type="dijit.form.Form" 
+      method="post" >
+  <input type="hidden" name="id" value="{{ID}}" />
+  <label>Name:</label><br>
+  <input type="text" name="name" value="{{NAME}}" size="50" class="" {{DOJOTEXTBOX}}/><br />
+  <label>Description:</label><br>
+  <textarea name="description" rows="5" cols="50" {{DOJOSIMPLETEXTAREA}}>
+    {{DESCRIPTION}}
+  </textarea> <br>
+  <label>Dosage (grams):</label><br>
+  <input type="text" name="dosage" value="{{DOSAGE}}" size="50" {{DOJOTEXTBOX}}/><br />
+  <label>Dosage Size:</label><br>
+  <input  type="text" name="dosage_size" value="{{DOSAGE_SIZE}}" size="50" {{DOJOTEXTBOX}}/> <br />
+  <label>Nutrients:</label><br>
+  <select id="macronutrient_select">
+    {{#MACRONUTRIENTS_SELECT}}
+    <option value="{{NUTRIENT}}" data-dosage="{{DOSAGE}}">{{NUTRIENT}}</option>
+    {{/MACRONUTRIENTS_SELECT}}
+  </select>
+  <button class="form_btn">Add</button>
+  <img style="display:none" src="{{STATIC_PREFIX}}images/buttons/cross.png" class="closebtn"></img>
+  <div id="macronutrients_form">
+    Add nutrients by selecting the nutrient and clicking on the 'Add'
+    button.<br>
+    Remove by clicking on the delete button.
+  </div>
+  
+  <button {{DOJOBUTTON}} type="submit" name="submitButton" value="Submit">Submit</button>
+  <a href="/nutrition">back</a>
+</form>
+
+{{> footer}}

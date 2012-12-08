@@ -1,0 +1,50 @@
+{{> header}}
+<div id="home">
+  <div id="heading">
+    <div id="subheader">
+      Optimize your nutrition.
+    </div>
+    <b>NUTRIENT LOG</b>
+  </div>
+  <ol id="details1" class="details">
+    <li>
+      Calculate individualized nutrition needs.
+    </li>
+    <li>
+      Track your daily nutrition intake.
+    </li>
+    <li>
+      Customized to your body type and level of activity.
+    </li>
+    <li>
+      Share your nutrition plans with family and friends.
+    </li>
+  </ol>
+  <div id="buttons">
+    <div class="actionmessage">
+      <a class="button" id="login-button" href="/login" >Login</a>
+      <p>If you have an account with Nutrient Log, click here to login.</p>
+    </div>
+    <div class="actionmessage">
+      <a class="button" id="register-button" href="/register" >Register</a>
+      <p>If you are new to Nutrient Log, click here to get started.</p>
+    </div>
+  </div>
+  <form id="login-form" action="/login" method="post" >
+  <label for="login_userid">User name: </label><input type="text" name="userid" id="login_userid"/><br />
+  <label for="login_password" >Password:</label> <input type="password" name="pwd" id="login_password"/><br />
+  <input type="submit" value="Submit" />
+  </form>
+  <form id="register-form" action="/register" method="post">
+  <label for="name">Name: <input type="text" name="name" /><br />
+  <label for="email">Email: <input type="text" name="email" /><br />
+  <br>
+  <label for="register_userid"> User name:</label> <input type="text" name="userid" id="register_userid"/><br />
+  <label for="register_password"> Password:</label> <input type="password" name="pwd" id="register_password" /><br />
+  <input type="submit" value="Submit" />
+  </form>
+  {{#MESSAGE}}
+    <b> Login: {{STATUS}}</b>
+  {{/MESSAGE}}
+</div>
+{{> footer}}
