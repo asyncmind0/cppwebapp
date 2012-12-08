@@ -64,7 +64,21 @@ define([ 'dojo/has', 'require' ], function (has, require) {
                     }
                     dojo.query('.deletepost').on('click',deletepost);
                     parser.parse();
-                    dojo.style(dojo.query('.main')[0],'display','');
+                    dojo.connect(dojo.byId("login-button"),"onclick",function(e){
+                        dojo.style("register-form","display","none");
+                        dojo.style("login-form","display","block");
+                        event.stop(e);
+                        return false;
+                        });
+                    dojo.connect(dojo.byId("register-button"),"onclick",function(e){
+                        dojo.style("login-form","display","none");
+                        dojo.style("register-form","display","block");
+                        event.stop(e);
+                        return false;
+                        });
+                    dojo.forEach(dojo.query('.hidden'), function(item){
+                    dojo.style(item,'display','block');
+                        });
                     //dojo.style('sidebar','display','');
                 });
     }

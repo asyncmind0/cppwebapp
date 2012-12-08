@@ -24,20 +24,21 @@ static std::list<std::string> scripts = {"app/nutrition"};
 */
 
 void nurition_handler(request_args &r){
-    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
-    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"nutrition.html");
+    mustache::Context* dict = base_template_variables(new mustache::Context(), scripts);
     std::list<Supplement> supplements;
     soci::session sql(r.db_pool);
     Supplement::get_all(sql,supplements);
+    mustache::PlustacheTypes::CollectionType c;
     for(auto it:supplements){
-        ctemplate::TemplateDictionary* post_dict = content_dict->AddSectionDictionary("SUPPLEMENTS");
-        post_dict->SetValue("NAME", it.name);
+        mustache::PlustacheTypes::ObjectType post_dict;
+        post_dict["NAME"] =  it.name;
         char uuid_str[37];
         uuid_unparse(it.uuid,uuid_str);
-        post_dict->SetValue("ID", uuid_str);
+        post_dict["ID"] = uuid_str;
+        c.push_back(post_dict);
     }
-    content_dict->ShowSection("SUPPLEMENTS");
-    r.conn.reply_http(r.req,render_template("base.html",dict),200,"OK",default_headers);
+    dict->add("SUPPLEMENTS",c);
+    r.conn.reply_http(r.req,render_template("nutrition",dict),200,"OK",default_headers);
 }
 
 void nurition_edit_handler(request_args &r){
@@ -88,27 +89,30 @@ void nurition_edit_handler(request_args &r){
             log_ERROR("unknown db error");
         }
     }
-    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
-    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"nutrition_edit.html",scripts);
+    mustache::Context* dict = base_template_variables(new mustache::Context(), scripts);
+    mustache::PlustacheTypes::CollectionType macronutrients_section;
     for(auto nutrient : s.nutrients){
-        ctemplate::TemplateDictionary *macronutrients_dict = content_dict->AddSectionDictionary("MACRONUTRIENTS");
-        macronutrients_dict->ShowSection("MACRONUTRIENTS");
-        macronutrients_dict->SetValue("NUTRIENT",nutrient.first);
-        macronutrients_dict->SetValue("DOSAGE",toDoubleStr(nutrient.second));
+        mustache::PlustacheTypes::ObjectType macronutrients_dict;
+        macronutrients_dict["NUTRIENT"] = nutrient.first;
+        macronutrients_dict["DOSAGE"] = toDoubleStr(nutrient.second);
+        macronutrients_section.push_back(macronutrients_dict);
     }
     std::unordered_map<std::string, double> macronutrients ;
     MacroNutrient::get_dict(sql,macronutrients);
+    mustache::PlustacheTypes::CollectionType drvmap_section;
     for(auto nutrient : macronutrients){
-        ctemplate::TemplateDictionary *drvmap = content_dict->AddSectionDictionary("DRVMAP");
-        drvmap->ShowSection("DRVMAP");
-        drvmap->SetValue("NUTRIENT",nutrient.first);
-        drvmap->SetValue("DRV",toDoubleStr(nutrient.second));
+        mustache::PlustacheTypes::ObjectType drvmap;
+        drvmap["NUTRIENT"] = nutrient.first;
+        drvmap["DRV"] = toDoubleStr(nutrient.second);
+        drvmap_section.push_back(drvmap);
     }
-    content_dict->SetValue("NAME",s.name);
-    content_dict->SetValue("DESCRIPTION",s.description);
-    content_dict->SetValue("ID", uuid);
-    content_dict->SetValue("DOSAGE",toDoubleStr(s.dosage));
-    r.conn.reply_http(r.req,render_template("base.html",dict),code,"OK",redir_headers);
+    dict->add("NAME",s.name);
+    dict->add("DESCRIPTION",s.description);
+    dict->add("ID", uuid);
+    dict->add("DOSAGE",toDoubleStr(s.dosage));
+    dict->add("DRVMAP", drvmap_section);
+    dict->add("MACRONUTRIENTS",macronutrients_section);
+    r.conn.reply_http(r.req,render_template("nutrition_edit",dict),code,"OK",redir_headers);
 
 }
 
@@ -133,22 +137,23 @@ void macronutrients_list_handler(request_args &r){
 }
 
 void macronutrient_handler(request_args &r){
-    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
-    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"macronutrients.html",scripts);
+    mustache::Context* dict = base_template_variables(new mustache::Context(), scripts);
+    mustache::PlustacheTypes::CollectionType macronutrients_section;
     std::list<MacroNutrient> macronutrients;
     soci::session sql(r.db_pool);
     MacroNutrient::get_all(sql,macronutrients);
     for(auto it:macronutrients){
-        ctemplate::TemplateDictionary* post_dict = content_dict->AddSectionDictionary("MACRONUTRIENTS");
-        post_dict->SetValue("NAME", it.name);
+        mustache::PlustacheTypes::ObjectType post_dict;
+        post_dict["NAME"] = it.name;
         char uuid_str[37];
         uuid_unparse(it.uuid,uuid_str);
-        post_dict->SetValue("ID", uuid_str);
+        post_dict["ID"] = uuid_str;
         std::ostringstream s;
         s << it.drv;
-        post_dict->SetValue("DRV", s.str());
+        post_dict["DRV"] = s.str();
     }
-    r.conn.reply_http(r.req,render_template("base.html",dict),200,"OK",default_headers);
+    dict->add("MACRONUTRIENTS", macronutrients_section);
+    r.conn.reply_http(r.req,render_template("macronutrients",dict),200,"OK",default_headers);
 }
 void macronutrient_edit_handler(request_args &r){
     if(r.args.size()<2){
@@ -188,15 +193,14 @@ void macronutrient_edit_handler(request_args &r){
             log_ERROR("unknown db error");
         }
     }
-    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
-    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"macronutrient_edit.html",scripts);
-    content_dict->SetValue("NAME",s.name);
-    content_dict->SetValue("DESCRIPTION",s.description);
-    content_dict->SetValue("ID", uuid);
+    mustache::Context* dict = base_template_variables(new mustache::Context(), scripts);
+    dict->add("NAME",s.name);
+    dict->add("DESCRIPTION",s.description);
+    dict->add("ID", uuid);
     std::ostringstream str;
     str << s.drv;
-    content_dict->SetValue("DRV",str.str());
-    r.conn.reply_http(r.req,render_template("base.html",dict),code,"OK",redir_headers);
+    dict->add("DRV",str.str());
+    r.conn.reply_http(r.req,render_template("macronutrient_edit",dict),code,"OK",redir_headers);
 }
 
 extern "C" void init_handler(std::unordered_map<std::string, request_handler> &request_handlers_map){

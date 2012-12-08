@@ -4,17 +4,15 @@
 #include "../models/post.h"
 #include "../models/user.h"
 #include  <uuid/uuid.h>
+#include <boost/algorithm/string.hpp>
 
 static std::list<std::string> scripts = {};
 
 void login_handler(request_args &r){
     int code=200;
     std::vector<m2pp::header> redir_headers = {{"Content-Type","text/html"}};
-    ctemplate::TemplateDictionary* dict =base_template_variables(new ctemplate::TemplateDictionary("login"), scripts);
-    ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("MAINCONTENT");
-    content_dict->SetFilename("login.html");
-    ctemplate::TemplateDictionary* login_form_section = content_dict->AddSectionDictionary("LOGIN_FORM");
-    content_dict->ShowSection("LOGIN_FORM");
+    mustache::Context* dict = base_template_variables(new mustache::Context(), scripts);
+    mustache::PlustacheTypes::ObjectType login_form_section, message_section;
     soci::session sql(r.db_pool);
     User *user  = new User();
     if(header_value(r.req.headers,"METHOD") == "POST"){
@@ -26,20 +24,21 @@ void login_handler(request_args &r){
         log_DEBUG(username);
         sql << "select * from users where username = '" << username << "'",soci::into(*user);
         if(!sql.got_data()){
-            content_dict->SetValueAndShowSection("STATUS", "Username is not registered.", "MESSAGE");
+            message_section["STATUS"] = "Username is not registered.";
         }else{
             redir_headers.push_back({"Location","/nutrition/" });
             code = 303;
         }
     }
+    dict->add("LOGIN_FORM", login_form_section);
+    dict->add("MESSAGE", message_section);
     
-    r.conn.reply_http(r.req,render_template("base.html",dict),code,"OK",redir_headers);
+    r.conn.reply_http(r.req,render_template("login",dict),code,"OK",redir_headers);
 }
 
 void register_handler(request_args &r){
-    ctemplate::TemplateDictionary* dict =base_template_variables(new ctemplate::TemplateDictionary("register"), scripts);
-    ctemplate::TemplateDictionary *content_dict = dict->AddIncludeDictionary("MAINCONTENT");
-    content_dict->SetFilename("register.html");
+    mustache::Context* dict = base_template_variables(new mustache::Context(), scripts);
+    mustache::PlustacheTypes::ObjectType registration_form_section, message_section;
     if(header_value(r.req.headers,"METHOD") == "POST"){
         std::unordered_map<std::string,std::string> registration_form = getFormFields(r.req.body);
         for(auto fields:registration_form){
@@ -47,26 +46,26 @@ void register_handler(request_args &r){
         }
         time_t now = time(NULL);
         std::tm *timeinfo = localtime(&now);
+        std::vector<std::string> names = {"",""};
+        boost::split(names, registration_form["name"], boost::is_any_of(" "));
         User u(registration_form["userid"],
-             registration_form["firstname"],
-             registration_form["lastname"],
+               names[0],
+               names[1],
              registration_form["password"],
              *timeinfo);
         soci::session sql(r.db_pool);
         int status = User::create(sql,u);
         if(status==1){
-            content_dict->SetValueAndShowSection("REGISTER_STATUS", "success", "REGISTER_MESSAGE");
+            message_section["STATUS"] = "success";
         }else if(status==2){
-            content_dict->SetValueAndShowSection("REGISTER_STATUS", "User id already exists.", "REGISTER_MESSAGE");
-            content_dict->ShowSection("REGISTER_FORM");
+            message_section["STATUS"] = "User id already exists.";
         }else{
-            content_dict->SetValueAndShowSection("REGISTER_STATUS", "fail", "REGISTER_MESSAGE");
-            content_dict->ShowSection("REGISTER_FORM");
+            message_section["STATUS"] = "fail";
         }
-    }else{
-        content_dict->ShowSection("REGISTER_FORM");
     }
-    r.conn.reply_http(r.req,render_template("base.html",dict),200,"OK",default_headers);
+    dict->add("REGISTER_FORM",registration_form_section);
+    dict->add("MESSAGE",message_section);
+    r.conn.reply_http(r.req,render_template("register",dict),200,"OK",default_headers);
 }
 
 extern "C" void init_handler(std::unordered_map<std::string, request_handler> &request_handlers_map){

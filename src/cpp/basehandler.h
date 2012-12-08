@@ -21,6 +21,7 @@
 #include <plustache_types.hpp>
 #include <soci/soci.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 typedef struct _request_args_ {
     soci::connection_pool &db_pool;
@@ -38,13 +39,17 @@ typedef int (*handler_initializer)(std::unordered_map<std::string, request_handl
 static std::vector<m2pp::header> default_headers = {{"Content-Type","text/html"},};
 
 void include_scripts(mustache::Context *dict,const std::list<std::string> &scripts){
-    mustache::PlustacheTypes::CollectionType c;
-    for(auto it:scripts){
+    if(scripts.size()>0){
+        mustache::PlustacheTypes::CollectionType c;
+        std::string joined = boost::algorithm::join(scripts, "\", \"");
         mustache::PlustacheTypes::ObjectType script;
+        script["SCRIPT"] = "\""+joined+"\"";
         c.push_back(script);
+        dict->add("SCRIPTS",c);
+        log_DEBUG("here");
     }
-    dict->add("scripts",c);
 }
+
 mustache::Context* base_template_variables(mustache::Context *dict,const std::list<std::string> &scripts = {}){
     dict->add("TITLE",  "Nutrient Log - Optimize your nutrition.");
     dict->add("DESCRIPTION", "Nutrient Log - Optimize your nutrition.");
@@ -58,9 +63,9 @@ mustache::Context* base_template_variables(mustache::Context *dict,const std::li
 }
 
 std::string render_template(const std::string templatefile, mustache::Context* dict){
-    std::string template_path("src/html/");
+    std::string template_path("src/html/mustache/");
     mustache::template_t t(template_path);
-    return t.render(templatefile,*dict);
+    return t.render(templatefile+".mustache",*dict);
 }
 
 const std::string header_value(std::vector<m2pp::header> headers, std::string key){

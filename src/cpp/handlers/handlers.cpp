@@ -8,21 +8,22 @@
 static std::list<std::string> scripts = {};
 
 void index_handler(request_args &r){
-    mustache::Context* dict =new mustache::Context();
-    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"index.html",scripts);
-    content_dict->SetValue("FIRST_NAME","Steven");
-    content_dict->SetValue("LAST_NAME","Joseph");
+    mustache::Context* dict = base_template_variables(new mustache::Context(), scripts);
+    dict->add("FIRST_NAME","Steven");
+    dict->add("LAST_NAME","Joseph");
     std::list<Post> posts;
     soci::session sql(r.db_pool);
     Post::get_all(sql,posts);
+    mustache::PlustacheTypes::CollectionType c;
     for(auto it:posts){
-        ctemplate::TemplateDictionary* post_dict = content_dict->AddSectionDictionary("POSTS");
-        post_dict->SetValue("TITLE", it.title);
+        mustache::PlustacheTypes::ObjectType post_dict;
+        post_dict["TITLE"] =  it.title;
         char uuid_str[37];
         uuid_unparse(it.uuid,uuid_str);
-        post_dict->SetValue("ID", uuid_str);
+        post_dict["ID"] =  uuid_str;
     }
-    r.conn.reply_http(r.req,render_template("base.html",content_dict),200,"OK",default_headers);
+    dict->add("POSTS",c);
+    r.conn.reply_http(r.req,render_template("posts",dict),200,"OK",default_headers);
 }
 
 void edit_handler(request_args &r){
@@ -32,8 +33,7 @@ void edit_handler(request_args &r){
     }
     std::vector<m2pp::header> redir_headers = {{"Content-Type","text/html"}};
     int code = 200;
-    ctemplate::TemplateDictionary* dict =new ctemplate::TemplateDictionary("base");
-    ctemplate::TemplateDictionary* content_dict = get_content_dict(dict,"edit.html",scripts);
+    mustache::Context* dict = base_template_variables(new mustache::Context(), scripts);
     Post *post  = new Post("","");
     soci::session sql(r.db_pool);
     std::string uuid;
@@ -62,11 +62,11 @@ void edit_handler(request_args &r){
             log_ERROR("unknown db error");
         }
     }
-    content_dict->SetValue("TITLE",post->title);
-    content_dict->SetValue("BODY",post->body);
-    content_dict->SetValue("ID", uuid);
+    dict->add("TITLE",post->title);
+    dict->add("BODY",post->body);
+    dict->add("ID", uuid);
     delete post;
-    r.conn.reply_http(r.req,render_template("base.html",dict),code,"OK",redir_headers);
+    r.conn.reply_http(r.req,render_template("post_edit",dict),code,"OK",redir_headers);
 }
 
 void delete_handler(request_args &r){
@@ -92,7 +92,6 @@ void delete_handler(request_args &r){
     render_json(r,resp);
 }
 
-
 void dbtest_handler(request_args &r){
     time_t now = time(NULL);
     std::tm *timeinfo = localtime(&now);
@@ -105,7 +104,6 @@ void dbtest_handler(request_args &r){
     Post::get_all(sql,posts);
     r.conn.reply_http(r.req, "Dbtest done");
 }
-
 
 extern "C" void init_handler(std::unordered_map<std::string, request_handler> &request_handlers_map){
     request_handlers_map["/blog"] = &index_handler;
